@@ -18,6 +18,16 @@ ROOTFS_PKGMANAGE_PKGS ?= '${@base_conditional("ONLINE_PACKAGE_MANAGEMENT", "none
 CONMANPKGS ?= "connman connman-angstrom-settings connman-plugin-loopback connman-plugin-ethernet connman-plugin-wifi"
 CONMANPKGS_libc-uclibc = ""
 
+#
+# Some machine types require specialized Xen images-- for example, machines which need modified bootloaders
+# to run Xen. For those cases, we'll modify the image types to accept Xen-enabled bootloaders.
+#
+# Ideally, the dom0 and core image should be separated-- but for now, they're conflated, as they're both very
+# hardware specific. Guest images, in turn, _must_ be platform neutral. (They should run on xen-${arch}).
+#
+IMAGE_CLASSES := "${@d.getVar("IMAGE_CLASSES").replace("sdcard_image-sunxi", "sdcard_image-xen-sunxi")}"
+
+
 IMAGE_INSTALL += " \
 	angstrom-packagegroup-boot \
 	packagegroup-basic \
@@ -26,10 +36,11 @@ IMAGE_INSTALL += " \
 	systemd-analyze \
 	fixmac \
 	cpufreq-tweaks \
+  packagegroup-xen-hypervisor \
   packagegroup-xen-tools \
 "
 
-# Systemd journal is preffered
+# Systemd journal is preferred.
 BAD_RECOMMENDATIONS += "busybox-syslog"
 
 IMAGE_DEV_MANAGER   = "udev"
@@ -37,6 +48,6 @@ IMAGE_INIT_MANAGER  = "systemd"
 IMAGE_INITSCRIPTS   = " "
 IMAGE_LOGIN_MANAGER = "busybox shadow"
 
-export IMAGE_BASENAME = "systemd-image"
+export IMAGE_BASENAME = "xen-dom0"
 
 inherit image

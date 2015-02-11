@@ -50,12 +50,12 @@ do_install_append() {
 #
 # Add our new uImage to the deploy folder.
 #
-sysroot_stage_all_append() {
-    install -d ${DEPLOY_DIR_IMAGE}
-    
-    #If we have a xen uImage, then install that.
-    if [ -f ${D}/boot/xen.uimg ]; then
-        install -m 0644 ${D}/boot/xen.gz ${DEPLOY_DIR_IMAGE}/xen-${MACHINE}.uimg
-    fi
-}
+#sysroot_stage_all_append() {
+#    install -d ${DEPLOY_DIR_IMAGE}
+#    
+#    #If we have a xen uImage, then install that.
+#    if [ -f ${D}/boot/xen.uimg ]; then
+#        install -m 0644 ${D}/boot/xen.uimg ${DEPLOY_DIR_IMAGE}/xen-${MACHINE}.uimg
+#    fi
+#}
 
