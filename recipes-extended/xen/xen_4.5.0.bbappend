@@ -8,15 +8,20 @@
 inherit kernel-arch deploy
 
 FILES_${PN}-hypervisor += "/boot/xen.uimg"
-
+XEN_IMAGETYPE ?= "zImage"
 
 #
 # If we've been asked to build a uImage for the primary kernel, build a uImage for Xen. 
 # (We'll create a zImage for the dom0 kernel anyway-- as Xen is capable of loading them.)
 #
+# TODO: Decide if this is worth keeping around-- it adds another "surface" to be maintained,
+#       in exchange for adding support for older versions of u-boot (like those used on the
+#       Samsung Chromebook.) If so, should this be here, or should it be the responsibility
+#       of the Chromebook BSP?
+#
 do_uboot_mkimage() {
 
-	if test "x${KERNEL_IMAGETYPE}" = "xuImage" ; then 
+	if test "x${XEN_IMAGETYPE}" = "xuImage" ; then 
 		if (test "x${KEEPUIMAGE}" != "xyes") || ! [ -e xen/xen.uimg ]; then
 
 			ENTRYPOINT=${UBOOT_ENTRYPOINT}
@@ -43,19 +48,9 @@ addtask uboot_mkimage before do_install after do_compile
 # copied by a seperate boot script.
 # 
 do_install_append() {
-   pwd
-   install -m 0644 xen/xen.uimg ${D}/boot/xen.uimg
+
+  if test "x${XEN_IMAGETYPE}" = "xuImage" ; then 
+    install -m 0644 xen/xen.uimg ${D}/boot/xen.uimg
+  fi
+
 }
-
-#
-# Add our new uImage to the deploy folder.
-#
-#sysroot_stage_all_append() {
-#    install -d ${DEPLOY_DIR_IMAGE}
-#    
-#    #If we have a xen uImage, then install that.
-#    if [ -f ${D}/boot/xen.uimg ]; then
-#        install -m 0644 ${D}/boot/xen.uimg ${DEPLOY_DIR_IMAGE}/xen-${MACHINE}.uimg
-#    fi
-#}
-

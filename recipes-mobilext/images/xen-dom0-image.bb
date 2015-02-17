@@ -6,7 +6,6 @@
 # Image for a Xen domain 0 system on ARM or x86.
 #
 
-
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
 
@@ -18,21 +17,12 @@ ROOTFS_PKGMANAGE_PKGS ?= '${@base_conditional("ONLINE_PACKAGE_MANAGEMENT", "none
 CONMANPKGS ?= "connman connman-angstrom-settings connman-plugin-loopback connman-plugin-ethernet connman-plugin-wifi"
 CONMANPKGS_libc-uclibc = ""
 
-#
-# Some machine types require specialized Xen images-- for example, machines which need modified bootloaders
-# to run Xen. For those cases, we'll modify the image types to accept Xen-enabled bootloaders.
-#
-# Ideally, the dom0 and core image should be separated-- but for now, they're conflated, as they're both very
-# hardware specific. Guest images, in turn, _must_ be platform neutral. (They should run on xen-${arch}).
-#
-IMAGE_CLASSES := "${@d.getVar("IMAGE_CLASSES").replace("sdcard_image-sunxi", "sdcard_image-xen-sunxi")}"
-
-
 IMAGE_INSTALL += " \
 	angstrom-packagegroup-boot \
 	packagegroup-basic \
 	${CONMANPKGS} \
-	${ROOTFS_PKGMANAGE_PKGS} update-alternatives-cworth \
+	${ROOTFS_PKGMANAGE_PKGS} \
+  update-alternatives-cworth \
 	systemd-analyze \
 	fixmac \
 	cpufreq-tweaks \

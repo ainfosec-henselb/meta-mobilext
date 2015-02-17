@@ -36,10 +36,8 @@ IMAGE_DEPENDS_sunxi-sdimg += " \
       xen \
 			virtual/kernel \
 			virtual/bootloader \
-      sunxi-board-fex \
+      kernel-devicetree \
 			"
-
-rootfs[depends] += "sunxi-board-fex:do_deploy"
 
 # SD card image name
 SDIMG = "${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.sunxi-sdimg"
@@ -72,20 +70,21 @@ IMAGE_CMD_sunxi-sdimg () {
 	BOOT_BLOCKS=$(LC_ALL=C parted -s ${SDIMG} unit b print | awk '/ 1 / { print substr($4, 1, length($4 -1)) / 512 /2 }')
 	mkfs.vfat -n "${BOOTDD_VOLUME_ID}" -S 512 -C ${WORKDIR}/boot.img $BOOT_BLOCKS
 
-  #Copy the resultant xen uImage onto the boot partition.
-  mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/kernel/xen.uimg ::xen.uimg
+  #Copy the resultant xen image onto the boot partition.
+  #TODO: Simplify down to xen-${XEN_IMAGETYPE}.
+  if [ "x$XEN_IMAGETYPE" = "uImage" ]; then
+    mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/kernel/xen.uimg ::xen-uImage
+  else
+    mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/kernel/xen ::xen-zImage
+  fi
   
-  #TODO XXX FIXME: Copy the linux zImage onto the boot partition, as well.
-	#mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/usr/src/kernel/${KERNEL_IMAGETYPE} ::linux.uimg
+  #Copy the dom0 image onto the boot partition...
+	mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/usr/src/kernel/${KERNEL_IMAGETYPE} ::linux-${KERNEL_IMAGETYPE}
 
-  #TODO XXX FIXME: Replace FEX files with the standard DTBs.
-  #If a FEX file (a file defining the SoC features) exists, copy it into our new boot partition.
-	if [ -e "${DEPLOY_DIR_IMAGE}/fex.bin" ]
-	then
-		mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/fex.bin ::script.bin
-	fi
+  # TODO XXX FIXME Copy the DTS onto the boot partition...
+	mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/boot/${KERNEL_IMAGETYPE} ::deviceTree
 
-	#Add a small file identifying the 
+	#Add a small file identifying the current build.
 	echo "${IMAGE_NAME}-${IMAGEDATESTAMP}" > ${WORKDIR}/image-version-info
 	mcopy -i ${WORKDIR}/boot.img -v ${WORKDIR}//image-version-info ::
 
