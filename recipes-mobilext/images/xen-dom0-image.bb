@@ -28,6 +28,7 @@ IMAGE_INSTALL += " \
 	cpufreq-tweaks \
   packagegroup-xen-hypervisor \
   packagegroup-xen-tools \
+  kernel-devicetree \
 "
 
 # Systemd journal is preferred.

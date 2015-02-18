@@ -14,7 +14,7 @@ inherit image_types
 #
 
 # This image depends on the rootfs image
-IMAGE_TYPEDEP_sunxi-sdimg = "${SDIMG_ROOTFS_TYPE}"
+IMAGE_TYPEDEP_sunxi-xen-sdimg = "${SDIMG_ROOTFS_TYPE}"
 
 # Boot partition volume id
 BOOTDD_VOLUME_ID ?= "${MACHINE}"
@@ -29,22 +29,21 @@ IMAGE_ROOTFS_ALIGNMENT = "2048"
 SDIMG_ROOTFS_TYPE ?= "ext3"
 SDIMG_ROOTFS = "${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.${SDIMG_ROOTFS_TYPE}"
 
-IMAGE_DEPENDS_sunxi-sdimg += " \
-			parted-native \
-			mtools-native \
-			dosfstools-native \
-      xen \
-			virtual/kernel \
-			virtual/bootloader \
-      kernel-devicetree \
-			"
+IMAGE_DEPENDS_sunxi-xen-sdimg += " \
+    parted-native \
+    mtools-native \
+    dosfstools-native \
+    xen \
+    virtual/kernel \
+    u-boot-sunxi-xen \
+    "
 
 # SD card image name
-SDIMG = "${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.sunxi-sdimg"
+SDIMG = "${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.sunxi-xen-sdimg"
 
 IMAGEDATESTAMP = "${@time.strftime('%Y.%m.%d',time.gmtime())}"
 
-IMAGE_CMD_sunxi-sdimg () {
+IMAGE_CMD_sunxi-xen-sdimg () {
 
 	# Align partitions
 	BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE} + ${IMAGE_ROOTFS_ALIGNMENT} - 1)
@@ -81,12 +80,15 @@ IMAGE_CMD_sunxi-sdimg () {
   #Copy the dom0 image onto the boot partition...
 	mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/usr/src/kernel/${KERNEL_IMAGETYPE} ::linux-${KERNEL_IMAGETYPE}
 
-  # TODO XXX FIXME Copy the DTS onto the boot partition...
-	mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/boot/${KERNEL_IMAGETYPE} ::deviceTree
+  #Copy the device tree onto the boot partition...
+	mcopy -i ${WORKDIR}/boot.img -s ${IMAGE_ROOTFS}/boot/${KERNEL_DEVICETREE} ::deviceTree
+
+  #Finally, copy our boot script to the boot partition.
+	mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/boot.scr ::boot.scr
 
 	#Add a small file identifying the current build.
 	echo "${IMAGE_NAME}-${IMAGEDATESTAMP}" > ${WORKDIR}/image-version-info
-	mcopy -i ${WORKDIR}/boot.img -v ${WORKDIR}//image-version-info ::
+	mcopy -i ${WORKDIR}/boot.img -v ${WORKDIR}/image-version-info ::
 
 	#Copy the newly-constructed boot partition into the SD card image.
 	dd if=${WORKDIR}/boot.img of=${SDIMG} conv=notrunc seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync
