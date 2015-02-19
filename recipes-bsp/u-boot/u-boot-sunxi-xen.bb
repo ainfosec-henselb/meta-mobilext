@@ -10,9 +10,11 @@ inherit u-boot
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://Licenses/gpl-2.0.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-#TODO: Point to sunxi-next, and autorev?
+#
+# TODO: Get the virtualization changes merged into SunXI, so everything will work!
+#
 SRC_URI = " \
-    git://github.com/linux-sunxi/u-boot-sunxi.git;protocol=git;branch=sunxi \
+    git://github.com/MobileXT/u-boot-sunxi-virtualization.git;branch=sunxi-next;protocol=git \
     file://boot.cmd \
     "
 
@@ -21,10 +23,9 @@ FILESPATH := "${THISDIR}/u-boot-scripts"
 S = "${WORKDIR}/git"
 
 #Set up the package version...
-#TODO: Replace with autorev, once we point to sunxi.
 PE = "1"
-PV = "v2013.10+v2014.01-rc1"
-SRCREV = "d854c4de2f57107e35893c591f856f8f6d0ccc5d"
+PV = "git${SRCPV}"
+SRCREV = "${AUTOREV}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # And name the binary that we should generate.

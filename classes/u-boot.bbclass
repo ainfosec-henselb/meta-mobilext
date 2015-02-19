@@ -37,6 +37,11 @@ SPL_BINARY ?= ""
 SPL_IMAGE ?= "${SPL_BINARY}-${MACHINE}-${PV}-${PR}"
 SPL_SYMLINK ?= "${SPL_BINARY}-${MACHINE}"
 
+do_configure() {
+  #Run the configuratino setup for the given machine.
+  oe_runmake ${UBOOT_MACHINE}_config     
+}
+
 do_compile () {
 	if [ "${@base_contains('DISTRO_FEATURES', 'ld-is-gold', 'ld-is-gold', '', d)}" = "ld-is-gold" ] ; then
 		sed -i 's/$(CROSS_COMPILE)ld$/$(CROSS_COMPILE)ld.bfd/g' config.mk
@@ -52,7 +57,7 @@ do_compile () {
 		echo ${UBOOT_LOCALVERSION} > ${S}/.scmversion
 	fi
 
-	oe_runmake ${UBOOT_MACHINE}
+	#oe_runmake ${UBOOT_MACHINE}
 	oe_runmake ${UBOOT_MAKE_TARGET}
 }
 
@@ -76,7 +81,7 @@ do_install () {
 FILES_${PN} = "/boot ${sysconfdir}"
 FILESPATH =. "${FILE_DIRNAME}/u-boot-git/${MACHINE}:"
 
-uboot_deploy () {
+do_deploy () {
     install -d ${DEPLOYDIR}
     install ${S}/${UBOOT_BINARY} ${DEPLOYDIR}/${UBOOT_IMAGE}
 
@@ -92,10 +97,6 @@ uboot_deploy () {
         ln -sf ${SPL_IMAGE} ${DEPLOYDIR}/${SPL_BINARY}
         ln -sf ${SPL_IMAGE} ${DEPLOYDIR}/${SPL_SYMLINK}
     fi
-}
-
-do_deploy() {
-   uboot_deploy 
 }
 
 addtask deploy before do_build after do_compile
