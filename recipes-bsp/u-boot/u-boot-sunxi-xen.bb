@@ -102,5 +102,8 @@ do_install_append() {
 # Deploy our newly-created boot-script to our deploy directory.
 #
 do_deploy_append() {
+    #Place /both/ the boot.cmd and the boot.scr into the deploy directory,
+    #as both of these can be used for custom booting setups.
+    install ${S}/boot.cmd ${DEPLOYDIR}
     install ${D}/boot/boot.scr ${DEPLOYDIR}
 }

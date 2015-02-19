@@ -14,9 +14,10 @@ setenv xen_addr_r          "@UBOOT_XEN_ADDR@"
 setenv kernel_addr_r       "@UBOOT_DOM0_ADDR@"
 setenv dtb_addr_r          "@UBOOT_DTB_ADDR@"
 
-#Set up the device that we'll be using to 
+#Set up the device that we'll be using to provide the main
+#Xen and boot files.
 setenv boot_device         "@UBOOT_BOOT_DEVICE@"
-setenc boot_partition      "@UBOOT_BOOT_PARTITION@"
+setenv boot_partition      "@UBOOT_BOOT_PARTITION@"
 
 #Configure Xen and dom0.
 setenv dom0_memory         "@XEN_DOM0_MEMORY@"
@@ -32,7 +33,7 @@ setenv xen_extra_bootargs  "@XEN_EXTRA_BOOTARGS@"
 #Create a pair of environment variables which will hold our boot arguments.
 #These are mostly for convenience-- they make it easier for the user to edit the command 
 #line. They're used directly below.
-setenv xen_bootargs  "console=dtuart dtuart=$xen_serial dom0_mem=$dom0_memory $xen_extra_bootargs" 
+setenv xen_bootargs  "console=dtuart dtuart=$xen_serial_port dom0_mem=$dom0_memory $xen_extra_bootargs"
 setenv dom0_bootargs "console=hvc0 ignore_loglevel psci=enable clk_ignore_unused root=$dom0_root earlyprintk=xen $dom0_extra_bootargs"
 
 #Load each of the images from the USB stick.
