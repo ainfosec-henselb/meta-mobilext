@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Assured Information Security, Inc.
 # Author: Kyle J. Temkin <temkink@ainfosec.com>
 #
-# Released under the MIT license (see COPYING.MIT for the terms)
+# Recipe released under the MIT license (see COPYING.MIT for the terms)
 
 
 # Borrow the kernel recipe's ability to map the current architecture to a u-boot architecture.
@@ -9,6 +9,35 @@ inherit kernel-arch deploy
 
 FILES_${PN}-hypervisor += "/boot/xen.uimg"
 XEN_IMAGETYPE ?= "zImage"
+
+
+#
+# Set up configuration options according to our local setup.
+#
+do_configure_prepend() {
+
+  CONFIGFILE="${S}/.config"
+
+  #Ensure that a configuration file exists.
+  touch $CONFIGFILE
+
+  #If we have a debug distro...
+  if [ x"${DISTRO_TYPE}" = x"debug" ]; then
+    
+    #... enable debugging...
+    echo "debug = y" >> $CONFIGFILE
+
+    #... and enable the architecture-specific debug options.
+    # Note that this is dependent on $ARCH, a Xen-specific variable (and not
+    # a bitbake one, like $PACKAGE_ARCH). These are the options available for
+    # the Xen "arm" architecture, which includes aarch64.
+    if [ x"${ARCH}" = x"arm" ]; then
+        echo "export CONFIG_EARLY_PRINTK=${XEN_EARLYPRINTK}" >> $CONFIGFILE
+    fi
+
+  fi  
+}
+
 
 #
 # If we've been asked to build a uImage for the primary kernel, build a uImage for Xen. 
