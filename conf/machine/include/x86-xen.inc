@@ -1,0 +1,4 @@
+
+KERNEL_IMAGETYPE = "bzImage"
+XEN_IMAGETYPE = "gzip"
+
