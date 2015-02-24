@@ -3,7 +3,7 @@
 #
 # Released under the MIT license (see COPYING.MIT for the terms)
 #
-# Image for a Xen domain 0 system on ARM or x86.
+# Base Xen platform, including a simple dom0.
 #
 
 LICENSE = "MIT"
@@ -28,8 +28,10 @@ IMAGE_INSTALL += " \
 	cpufreq-tweaks \
   packagegroup-xen-hypervisor \
   packagegroup-xen-tools \
-  kernel-devicetree \
 "
+
+#If we're on ARM, include a flattened device tree.
+IMAGE_INSTALL += "${@base_conditional("ARCH", "arm", "kernel-devicetree", "", d)}"
 
 # Systemd journal is preferred.
 BAD_RECOMMENDATIONS += "busybox-syslog"
