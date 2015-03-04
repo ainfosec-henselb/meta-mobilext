@@ -3,8 +3,12 @@
 #
 # Released under the MIT license (see COPYING.MIT for the terms)
 #
-# Base Xen platform, including a simple dom0.
+# Root filesystem for a simple dom0; including a kernel which can be used
+# to boot the image. Xen is not included, but can easily be added by appending
+# to IMAGE_INSTALL.
 #
+
+DESCRIPTION = "Root image for a simple Xen domain 0"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
@@ -30,14 +34,7 @@ IMAGE_INSTALL += " \
 	fixmac \
 "
 
-#Do not install the dom0 kernel into /boot, as we'll provide that in a separate location.
-PACKAGE_EXCLUDE="kernel-image"
-
-# Moved into the Xen boot image:
-#  packagegroup-xen-hypervisor 
-#
-#    If we're on ARM, include a flattened device tree.
-#    IMAGE_INSTALL += "${@base_conditional("ARCH", "arm", "kernel-devicetree", "", d)}"
+TARGET_HOSTNAME = "mobilext-dom0"
 
 # Systemd journal is preferred.
 BAD_RECOMMENDATIONS += "busybox-syslog"
@@ -47,6 +44,7 @@ IMAGE_INIT_MANAGER  = "systemd"
 IMAGE_INITSCRIPTS   = " "
 IMAGE_LOGIN_MANAGER = "busybox shadow"
 
-export IMAGE_BASENAME = "xen-base"
+export IMAGE_BASENAME = "xen-base-dom0"
 
+inherit override-hostname
 inherit image

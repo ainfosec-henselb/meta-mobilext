@@ -9,3 +9,6 @@
 KERNEL_IMAGETYPE = "bzImage"
 XEN_IMAGETYPE = "gzip"
 
+#Use a dynamically populated devfs, rather than a device tree on x86.
+USE_DEVFS = "1"
+
