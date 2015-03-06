@@ -3,13 +3,11 @@
 #
 # Recipe released under the MIT license (see COPYING.MIT for the terms)
 
-
 # Borrow the kernel recipe's ability to map the current architecture to a u-boot architecture.
 inherit kernel-arch deploy
 
-FILES_${PN}-hypervisor += "/boot/xen.uimg"
-XEN_IMAGETYPE ?= "zImage"
-
+#If we've built an EFI image, package it in the hypervisor package.
+FILES_${PN}-hypervisor = "/usr/lib64/efi/xen*.efi"
 
 #
 # Set up configuration options according to our local setup.
@@ -38,48 +36,11 @@ do_configure_prepend() {
   fi  
 }
 
-
 #
-# If we've been asked to build a uImage for the primary kernel, build a uImage for Xen. 
-# (We'll create a zImage for the dom0 kernel anyway-- as Xen is capable of loading them.)
+# Copy any additional images (e.g. Xen EFI images) created to the deploy directory.
 #
-# TODO: Decide if this is worth keeping around-- it adds another "surface" to be maintained,
-#       in exchange for adding support for older versions of u-boot (like those used on the
-#       Samsung Chromebook.) If so, should this be here, or should it be the responsibility
-#       of the Chromebook BSP?
-#
-do_uboot_mkimage() {
-
-	if test "x${XEN_IMAGETYPE}" = "xuImage" ; then 
-		if (test "x${KEEPUIMAGE}" != "xyes") || ! [ -e xen/xen.uimg ]; then
-
-			ENTRYPOINT=${UBOOT_ENTRYPOINT}
-      ##TODO: Support entry symbol behavior for Xen images?
-      #(See the kernel implementation of this function.)
-
-      #Compress the kernel image...
-      cp xen/xen xen.bin  
-      gzip -9 xen.bin
-
-      #... and convert it to a u-boot image.
-      uboot-mkimage -A ${UBOOT_ARCH} -O linux -T kernel -C gzip -a ${UBOOT_LOADADDRESS} -e $ENTRYPOINT -n "${DISTRO_NAME}/${PV}/${MACHINE}" -d xen.bin.gz xen/xen.uimg
-      rm -f xen.bin.gz
-
-		fi
-	fi
-}
-
-addtask uboot_mkimage before do_install after do_compile
-
-#
-# Copy the new xen.uimg into /boot/ on a normal target.
-# This can then be loaded by u-boot as the primary kernel, or
-# copied by a seperate boot script.
-# 
-do_install_append() {
-
-  if test "x${XEN_IMAGETYPE}" = "xuImage" ; then 
-    install -m 0644 xen/xen.uimg ${D}/boot/xen.uimg
+sysroot_stage_all_append() {
+  if [ -e ${D}/usr/lib64/xen.efi ]; then
+    install -m 664 ${D}/usr/lib64/xen.efi ${DEPLOY_DIR_IMAGE}/xen.efi 
   fi
-
 }

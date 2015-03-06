@@ -34,24 +34,31 @@ IMAGE_INSTALL += " \
   syslinux \
 "
 
-#And specify a nicer-looking (*) name for the image.
+#Specify a nicer-looking (*) name for the image.
 #* Hey, I said nic_er_.
 export IMAGE_BASENAME = "xen-base-boot-syslinux"
 
-#If we're using EFI, we should use a framebuffer for any VGA output;
-#as text-mode is not directly supported. Otherwise, leave things as they were.
-VGA = "${@base_contains("MACHINE_FEATURES", "efi", "gfx-1024x768-32", "current", d)}"
-VGA = ""
+#Specify the path at which we should create Xen-EFI configuration files.
+export XEN_EFI_CFG="${S}/xen.cfg"
 
 #The command line to be passed to Xen. Must not contain three dashes "---", as this
 #is syslinux's multiboot separator.
-XEN_OPTIONS = "console=com1,vga vga=${VGA} com1=${XEN_SERIAL_PORT} dom0_mem=${XEN_DOM0_MEMORY} ${XEN_EXTRA_BOOTARGS}"
+XEN_OPTIONS = "console=vga,com1 com1=${XEN_SERIAL_PORT} dom0_mem=${XEN_DOM0_MEMORY} ${XEN_EXTRA_BOOTARGS}"
 
 #The command line to be passed to the dom0 kernel. Must not contain three dashes "---".
 DOM0_OPTIONS = "console=hvc0 root=${DOM0_ROOT} earlyprintk=xen ${DOM0_EXTRA_BOOTARGS}"
 
 inherit bootimg
 
+# Unfortunately, the core bootimg class assumes we'll be using grub-efi, rather
+# than booting the target directly. Here, we'll directly override this.
+grubefi_hddimg_populate() {
+  xenefi_populate 
+}
+
+build_grub_cfg() {
+  build_xen_cfg
+}
 
 
 # Add the syslinux boot "com" objects to the boot partition.
@@ -61,14 +68,36 @@ syslinux_hddimg_populate_append() {
 	install -m 0444 ${STAGING_DATADIR}/syslinux/mboot.c32 ${HDDDIR}${SYSLINUXDIR}
 }
 
-#Add the xen image to the boot partition.
-populate_append() {
+
+#Add the xen image to the boot partition. If we're using BIOS, then populate a gzip'd
+#xen.img...
+syslinux_populate_append() {
+	install -m 0644 ${DEPLOY_DIR_IMAGE}/bzImage ${DEST}/vmlinuz
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/xen-${MACHINE}.gz ${DEST}/xen.gz
 }
 
+#... and if we're using UEFI, populate the xen EFI image and configuration.
+xenefi_populate() {
+
+  #Create the EFI boot directory, which is unfortunately needed by
+  #many UEFI clients. 
+  export EFI_DEST="${DEST}/EFI/BOOT"
+  install -d ${EFI_DEST}
+
+  #And populatge it with our boot components.
+  install -m 0644 ${XEN_EFI_CFG} ${EFI_DEST}/bootx64.cfg
+  install -m 0644 ${DEPLOY_DIR_IMAGE}/xen.efi ${EFI_DEST}/bootx64.efi 
+	install -m 0644 ${DEPLOY_DIR_IMAGE}/bzImage ${EFI_DEST}/vmlinuz
+}
+
+
+
 #
-#... and build the bootloader configuration necessary to start Xen.
+# Build the bootloader configuration necessary to start Xen.
 #
+
+#(These would look cleaner with Heredocs, but then I'd have to use tabs instead
+#of spaces, and no one wants that.)
 
 build_syslinux_cfg() {
 	echo ALLOWOPTIONS 1 > ${SYSLINUXCFG}
@@ -81,16 +110,22 @@ build_syslinux_cfg() {
 	echo APPEND xen.gz ${XEN_OPTIONS} --- vmlinuz ${DOM0_OPTIONS} >> ${SYSLINUXCFG}
 }
 
-EFI = "0"
+build_xen_cfg() {
+  echo "[global]" > ${XEN_EFI_CFG}
+  echo "default=main" >> ${XEN_EFI_CFG}
+  echo 
+  echo "[main]" >> ${XEN_EFI_CFG}
+  echo "options=${XEN_OPTIONS}" >> ${XEN_EFI_CFG}
+  echo "kernel=vmlinuz ${DOM0_OPTIONS}" >> ${XEN_EFI_CFG}
+
+  #TODO: Generalize this to a machine variable?
+  #echo "video=gfx-1024x768x32" >> ${XEN_EFI_CFG}
+}
 
 #
-# Override the core population logic, as a temporary fix until this patch makes it to our
-# bitbake: https://github.com/openembedded/oe-core/commit/75f83fdc5a78bf1b84dbcd6acb9fa3f76b2aac2c
+# Override the core population logic; we'll replace it on a per-bootloader basis above.
 #
 populate() {
 	DEST=$1
 	install -d ${DEST}
-
-	# Install bzImage, initrd, and rootfs.img in DEST for all loaders to use.
-	install -m 0644 ${DEPLOY_DIR_IMAGE}/bzImage ${DEST}/vmlinuz
 }
