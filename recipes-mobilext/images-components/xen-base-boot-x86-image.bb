@@ -22,10 +22,10 @@ COMPATIBLE_MACHINE := "(${@base_contains("AVAILTUNES", "x86", d.getVar("MACHINE"
 
 #Ensure that the relevant pieces are deployed before they're
 #needed by the boot-image-creation.
-do_bootimg[depends] += "   \
+do_bootimg[depends] += " \
   virtual/kernel:do_deploy \
+  xen:do_deploy \
 "
-
 #Specify the packages to pull into our staging directory.
 #We'll pull these apart to build our boot partition.
 IMAGE_INSTALL += " \

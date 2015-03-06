@@ -39,8 +39,16 @@ do_configure_prepend() {
 #
 # Copy any additional images (e.g. Xen EFI images) created to the deploy directory.
 #
-sysroot_stage_all_append() {
-  if [ -e ${D}/usr/lib64/xen.efi ]; then
-    install -m 664 ${D}/usr/lib64/xen.efi ${DEPLOY_DIR_IMAGE}/xen.efi 
+do_deploy() {
+  if [ -e ${D}/usr/lib64/efi/xen.efi ]; then
+    install -m 664 ${D}/usr/lib64/efi/xen.efi ${DEPLOY_DIR_IMAGE}/xen.efi 
   fi
 }
+addtask do_deploy after do_install
+
+#TODO: Determine if this can be removed.
+#sysroot_stage_all_append() {
+#  if [ -e ${D}/usr/lib64/xen.efi ]; then
+#    install -m 664 ${D}/usr/lib64/xen.efi ${DEPLOY_DIR_IMAGE}/xen.efi 
+#  fi
+#}
