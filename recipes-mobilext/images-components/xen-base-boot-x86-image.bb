@@ -20,10 +20,10 @@ PROVIDES += "virtual/boot-partition-image"
 #we had COMPATIBLE_ARCH!
 COMPATIBLE_MACHINE := "(${@base_contains("AVAILTUNES", "x86", d.getVar("MACHINE"), "", d)})"
 
-#Require the linux kernel and Xen to have been built prior to creating the image.
-DEPENDS += " \
-  virtual/kernel \
-  xen \
+#Ensure that the relevant pieces are deployed before they're
+#needed by the boot-image-creation.
+do_bootimg[depends] += "   \
+  virtual/kernel:do_deploy \
 "
 
 #Specify the packages to pull into our staging directory.
@@ -52,6 +52,8 @@ DOM0_OPTIONS = "console=hvc0 root=${DOM0_ROOT} earlyprintk=xen ${DOM0_EXTRA_BOOT
 
 inherit bootimg
 
+
+
 # Add the syslinux boot "com" objects to the boot partition.
 # TODO: Should this be in syslinux_populate_append? What here is HDDIMG specific?
 syslinux_hddimg_populate_append() {
@@ -79,14 +81,16 @@ build_syslinux_cfg() {
 	echo APPEND xen.gz ${XEN_OPTIONS} --- vmlinuz ${DOM0_OPTIONS} >> ${SYSLINUXCFG}
 }
 
+EFI = "0"
 
-build_grub_cfg() {
-  echo "serial --unit 0 --speed=115200 --word=8 --parity=no --stop=1" > ${GRUBCFG}
-  echo "default=xen" >> ${GRUBCFG}
-  echo "timeout=10" >> ${GRUBCFG}
-  echo >> ${GRUBCFG}
-  echo "menuentry xen {" >> ${GRUBCFG}
-  echo "    multiboot /xen.gz ${XEN_OPTIONS}" >> ${GRUBCFG}
-  echo "    module /vmlinuz ${DOM0_OPTIONS}" >> ${GRUBCFG}
-  echo "}" >> ${GRUBCFG}
+#
+# Override the core population logic, as a temporary fix until this patch makes it to our
+# bitbake: https://github.com/openembedded/oe-core/commit/75f83fdc5a78bf1b84dbcd6acb9fa3f76b2aac2c
+#
+populate() {
+	DEST=$1
+	install -d ${DEST}
+
+	# Install bzImage, initrd, and rootfs.img in DEST for all loaders to use.
+	install -m 0644 ${DEPLOY_DIR_IMAGE}/bzImage ${DEST}/vmlinuz
 }
