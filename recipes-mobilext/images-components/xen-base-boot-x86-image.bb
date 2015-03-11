@@ -8,17 +8,14 @@
 # directly to a partition.
 #
 
-
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
 
 #This package provides a boot partition image suitable for x86 machines.
 PROVIDES += "virtual/boot-partition-image"
 
-#This little stub effectively makes us compatible with the current machine, as
-#long as the current machine supports an x86-compatbile architecture. If only
-#we had COMPATIBLE_ARCH!
-COMPATIBLE_MACHINE := "(${@base_contains("AVAILTUNES", "x86", d.getVar("MACHINE"), "", d)})"
+#Ensure these boot images are only ever built for x86.
+COMPATIBLE_HOST = "(x86_64.*|i.86.*)" 
 
 #Ensure that the relevant pieces are deployed before they're
 #needed by the boot-image-creation.
@@ -31,12 +28,11 @@ do_bootimg[depends] += " \
 IMAGE_INSTALL += " \
   packagegroup-xen-hypervisor \
 	kernel-image \
-  syslinux \
 "
 
 #Specify a nicer-looking (*) name for the image.
 #* Hey, I said nic_er_.
-export IMAGE_BASENAME = "xen-base-boot-syslinux"
+export IMAGE_BASENAME = "xen-base-boot"
 
 #Specify the path at which we should create Xen-EFI configuration files.
 export XEN_EFI_CFG="${S}/xen.cfg"
