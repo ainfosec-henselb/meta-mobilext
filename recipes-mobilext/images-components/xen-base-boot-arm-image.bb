@@ -17,7 +17,6 @@ PROVIDES += "virtual/boot-partition-image"
 #Ensure that this image is only used on ARM architectures.
 COMPATIBLE_HOST = "(arm.*)"
 
-
 #Specify the packages to pull into our staging directory.
 #We'll pull these apart to build our boot partition.
 IMAGE_INSTALL += " \
@@ -31,9 +30,15 @@ IMAGE_DEPENDS += " \
   mtools-native \
   dosfstools-native \
   virtual/bootloader \
+  u-boot-mkimage-native \
   virtual/kernel \
   xen \
 "
+
+#Specify the files that will be used in the creation of this recipe,
+#(but which are not provided by another package.)
+FILESPATH = "${THISDIR}/xen-base-boot-arm-image" 
+SRC_URI   = "file://boot_machine_invariant.cmd"
 
 #Specify a nicer-looking name for the image.
 export IMAGE_BASENAME = "xen-base-boot"
@@ -46,39 +51,11 @@ inherit bootimg
 do_bootimg[depends] = " \
   dosfstools-native:do_populate_sysroot \
   mtools-native:do_populate_sysroot \
-  cdrtools-native:do_populate_sysroot \
-  ${@oe.utils.ifelse(d.getVar('COMPRESSISO'),'zisofs-tools-native:do_populate_sysroot','')} \
   virtual/kernel:do_deploy \
   virtual/bootloader:do_deploy \
+  ${PN}:do_unpack \
   xen:do_deploy \
 "
-
-
-FIXME_populate_boot () {
-
-  #Copy the resultant xen image onto the boot partition.
-  #TODO: Simplify down to xen-${XEN_IMAGETYPE}.
-  if [ "x$XEN_IMAGETYPE" = "uImage" ]; then
-    mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/kernel/xen.uimg ::xen-uImage
-  else
-    mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/kernel/xen ::xen-zImage
-  fi
-  
-  #Copy the dom0 image onto the boot partition...
-	mcopy -i ${WORKDIR}/boot.img -s ${STAGING_DIR_HOST}/usr/src/kernel/${KERNEL_IMAGETYPE} ::linux-${KERNEL_IMAGETYPE}
-
-  #Copy the device tree onto the boot partition...
-	mcopy -i ${WORKDIR}/boot.img -s ${IMAGE_ROOTFS}/boot/${KERNEL_DEVICETREE} ::deviceTree
-
-  #Finally, copy our boot script to the boot partition.
-	mcopy -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/boot.scr ::boot.scr
-
-	#Add a small file identifying the current build.
-	echo "${IMAGE_NAME}-${IMAGEDATESTAMP}" > ${WORKDIR}/image-version-info
-	mcopy -i ${WORKDIR}/boot.img -v ${WORKDIR}/image-version-info ::
-
-
-}
 
 #
 # Populate the provided working directory with the data to be placed into a hard drive image.
@@ -103,15 +80,49 @@ populate() {
 }
 
 #
-# Generate the boot configuration script for the 
+# Generate the boot configuration script for u-boot. 
 #
 generate_boot_configuration() {
 	DEST=$1
 	install -d ${DEST}
 
-  #FIXME: This should be generated /here/, not in the core package.
-  #For now, we'll copy for compatibility, but this really should be fixed.
-  install -m 0644 ${DEPLOY_DIR_IMAGE}/boot.scr ${DEST}/boot.scr
+  #Create the raw boot script...
+  install -d ${S}/boot 
+  BOOT_CFG=${S}/boot/boot.cmd
+
+  #... populate it with all of the machine-dependent values...
+  echo "#Determine the addresses into which we'll load the pieces of our system."          >  ${BOOT_CFG}
+  echo "#These are currently placeholder values-- they should be optimized for the system" >> ${BOOT_CFG}
+  echo "#we're going to be putting them into!"                                             >> ${BOOT_CFG}
+  echo "setenv xen_addr_r          \"${UBOOT_XEN_ADDR}\""                                  >> ${BOOT_CFG}
+  echo "setenv kernel_addr_r       \"${UBOOT_DOM0_ADDR}\""                                 >> ${BOOT_CFG}
+  echo "setenv dtb_addr_r          \"${UBOOT_DTB_ADDR}\""                                  >> ${BOOT_CFG}
+  echo                                                                                     >> ${BOOT_CFG}
+
+  echo "#Set up the device that we'll be using to provide the main"                        >> ${BOOT_CFG}
+  echo "#Xen and boot files."                                                              >> ${BOOT_CFG}
+  echo "setenv boot_device         \"${UBOOT_BOOT_DEVICE}\""                               >> ${BOOT_CFG}
+  echo "setenv boot_partition      \"${UBOOT_BOOT_PARTITION}\""                            >> ${BOOT_CFG}
+  echo                                                                                     >> ${BOOT_CFG}
+
+  echo "#Configure Xen and dom0."                                                          >> ${BOOT_CFG}
+  echo "setenv dom0_memory         \"${XEN_DOM0_MEMORY}\""                                 >> ${BOOT_CFG}
+  echo "setenv dom0_root           \"${UBOOT_DOM0_ROOT}\""                                 >> ${BOOT_CFG}
+  echo "setenv xen_serial_port     \"${XEN_SERIAL_PORT}\""                                 >> ${BOOT_CFG}
+  echo "setenv dom0_extra_bootargs \"${DOM0_EXTRA_BOOTARGS}\""                             >> ${BOOT_CFG}
+  echo "setenv xen_extra_bootargs  \"${XEN_EXTRA_BOOTARGS}\""                              >> ${BOOT_CFG}
+
+  echo                                                                                     >> ${BOOT_CFG}
+  echo                                                                                     >> ${BOOT_CFG}
+  echo "# --- Begin machine-invariant instructions. ---"                                   >> ${BOOT_CFG} 
+  echo                                                                                     >> ${BOOT_CFG}
+  echo                                                                                     >> ${BOOT_CFG}
+
+  #... populate it with the machine-independent bootloader instructions...
+  cat ${WORKDIR}/boot_machine_invariant.cmd >> ${BOOT_CFG}
+
+  #... and compile it into a u-boot script.
+  uboot-mkimage -A ${UBOOT_ARCH} -T script -d "${BOOT_CFG}" "${DEST}/boot.scr"
 }
 
 #

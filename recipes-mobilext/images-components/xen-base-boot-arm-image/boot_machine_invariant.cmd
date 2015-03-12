@@ -3,33 +3,6 @@
 #
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-#
-# <machine-generated environment setup>
-#
-
-#Determine the addresses into which we'll load the pieces of our system.
-#These are currently placeholder values-- they should be optimized for the system
-#we're going to be putting them into!
-setenv xen_addr_r          "@UBOOT_XEN_ADDR@"
-setenv kernel_addr_r       "@UBOOT_DOM0_ADDR@"
-setenv dtb_addr_r          "@UBOOT_DTB_ADDR@"
-
-#Set up the device that we'll be using to provide the main
-#Xen and boot files.
-setenv boot_device         "@UBOOT_BOOT_DEVICE@"
-setenv boot_partition      "@UBOOT_BOOT_PARTITION@"
-
-#Configure Xen and dom0.
-setenv dom0_memory         "@XEN_DOM0_MEMORY@"
-setenv dom0_root           "@UBOOT_DOM0_ROOT@"
-setenv xen_serial_port     "@XEN_SERIAL_PORT@"
-setenv dom0_extra_bootargs "@DOM0_EXTRA_BOOTARGS@"
-setenv xen_extra_bootargs  "@XEN_EXTRA_BOOTARGS@"
-
-#
-# </machine-generated-environment-setup>
-#
-
 #Create a pair of environment variables which will hold our boot arguments.
 #These are mostly for convenience-- they make it easier for the user to edit the command 
 #line. They're used directly below.
