@@ -10,6 +10,12 @@ inherit u-boot
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://Licenses/gpl-2.0.txt;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
+PROVIDES += "virtual/bootloader"
+
+#Depend on the ability to create u-boot images.
+#FIXME: Remove me once the mkimage is moved to virtual/boot-partition-image?
+DEPENDS += "u-boot-mkimage-native"
+
 #
 # TODO: Get the virtualization changes merged into SunXI, so everything will work!
 #
@@ -103,8 +109,5 @@ do_install_append() {
 # Deploy our newly-created boot-script to our deploy directory.
 #
 do_deploy_append() {
-    #Place /both/ the boot.cmd and the boot.scr into the deploy directory,
-    #as both of these can be used for custom booting setups.
-    install ${S}/boot.cmd ${DEPLOYDIR}
-    install ${D}/boot/boot.scr ${DEPLOYDIR}
+    install ${D}/boot/boot.scr ${DEPLOY_DIR_IMAGE}
 }
