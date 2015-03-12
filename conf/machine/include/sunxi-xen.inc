@@ -6,8 +6,7 @@ PREFERRED_PROVIDER_virtual/bootloader = "u-boot-sunxi-virtualization"
 XEN_IMAGETYPE = "zImage"
 KERNEL_IMAGETYPE = "zImage"
 
-IMAGE_CLASSES += "sdcard_image-xen-sunxi"
-IMAGE_FSTYPES += "ext3 tar.gz sunxi-xen-sdimg"
+IMAGE_FSTYPES += "ext3 tar.gz"
 
 MACHINE_EXTRA_RRECOMMENDS = "kernel-modules"
 
