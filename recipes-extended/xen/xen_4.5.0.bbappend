@@ -40,9 +40,17 @@ do_configure_prepend() {
 # Copy any additional images (e.g. Xen EFI images) created to the deploy directory.
 #
 do_deploy() {
+
+  #If we've generated a Xen EFI image, deploy it.
   if [ -e ${D}/usr/lib64/efi/xen.efi ]; then
     install -m 664 ${D}/usr/lib64/efi/xen.efi ${DEPLOY_DIR_IMAGE}/xen.efi 
   fi
+
+  #Deploy any Xen zImages.
+  if [ -e ${D}/boot/xen ]; then
+    install -m 664 ${D}/boot/xen ${DEPLOY_DIR_IMAGE}/xen-zImage
+  fi
+
 }
 addtask do_deploy after do_install
 
