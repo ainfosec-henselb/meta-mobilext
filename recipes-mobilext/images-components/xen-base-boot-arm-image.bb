@@ -130,12 +130,12 @@ generate_boot_configuration() {
 #
 do_bootimg() {
 
-    #Populate the directory which will be used to create the hard drive image...
-		populate ${HDDDIR}
+  #Populate the directory which will be used to create the hard drive image...
+	populate ${HDDDIR}
 
-    #... and generate the u-boot configuration for the given 
-    generate_boot_configuration ${HDDDIR}
+  #... and generate the u-boot configuration for the given 
+  generate_boot_configuration ${HDDDIR}
 
-    #Create the raw FAT image from the deployment directory.
-		build_fat_img ${HDDDIR} ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg
+  #Create the raw FAT image from the deployment directory.
+	build_fat_img ${HDDDIR} ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg
 }
