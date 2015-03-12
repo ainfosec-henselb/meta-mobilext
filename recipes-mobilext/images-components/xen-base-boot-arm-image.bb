@@ -22,6 +22,7 @@ COMPATIBLE_HOST = "(arm.*)"
 #We'll pull these apart to build our boot partition.
 IMAGE_INSTALL += " \
   packagegroup-xen-hypervisor \
+  kernel-devicetree \
 	kernel-image \
 "
 #And ensure we have all the dependencies necessary to create our image.
@@ -31,6 +32,7 @@ IMAGE_DEPENDS += " \
   dosfstools-native \
   virtual/bootloader \
   virtual/kernel \
+  xen \
 "
 
 #Specify a nicer-looking name for the image.
@@ -47,6 +49,7 @@ do_bootimg[depends] = " \
   cdrtools-native:do_populate_sysroot \
   ${@oe.utils.ifelse(d.getVar('COMPRESSISO'),'zisofs-tools-native:do_populate_sysroot','')} \
   virtual/kernel:do_deploy \
+  virtual/bootloader:do_deploy \
   xen:do_deploy \
 "
 
@@ -84,49 +87,44 @@ populate() {
 	DEST=$1
 	install -d ${DEST}
 
+  #TODO: Add support for uImage kernel types.
+
   #Copy the resultant xen image onto the boot partition.
-  #TODO: Simplify down to xen-${XEN_IMAGETYPE}.
-  if [ "x$XEN_IMAGETYPE" = "uImage" ]; then
-    install -m 0644 ${STAGING_KERNEL_DIR}/xen.uimg ${DEST}/xen-uImage
-  else
-    install -m 0644 ${STAGING_KERNEL_DIR}/xen ${DEST}/xen-zImage
-  fi
+  install -m 0644 ${DEPLOY_DIR_IMAGE}/xen-${XEN_IMAGETYPE} ${DEST}/xen-${XEN_IMAGETYPE}
 
 	#Populate the linux kernel image and device tree.
   #TODO: Change device tree extension to DTB.
   install -m 0644 ${STAGING_KERNEL_DIR}/${KERNEL_IMAGETYPE}  ${DEST}/linux-${KERNEL_IMAGETYPE}
-  install -m 0644 ${STAGING_KERNEL_DIR}/${KERNEL_DEVICETREE} ${DEST}/deviceTree
+  install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${KERNEL_DEVICETREE} ${DEST}/deviceTree
 
 	#Add a small file identifying the current build.
 	echo "${IMAGE_NAME}-${IMAGEDATESTAMP}" > ${DEST}/image-version-info
 
 }
 
+#
+# Generate the boot configuration script for the 
+#
+generate_boot_configuration() {
+	DEST=$1
+	install -d ${DEST}
 
+  #FIXME: This should be generated /here/, not in the core package.
+  #For now, we'll copy for compatibility, but this really should be fixed.
+  install -m 0644 ${DEPLOY_DIR_IMAGE}/boot.scr ${DEST}/boot.scr
+}
+
+#
+# Create the boot partition image.
+#
 do_bootimg() {
 
     #Populate the directory which will be used to create the hard drive image...
 		populate ${HDDDIR}
 
+    #... and generate the u-boot configuration for the given 
+    generate_boot_configuration ${HDDDIR}
+
     #Create the raw FAT image from the deployment directory.
 		build_fat_img ${HDDDIR} ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg
-}
-
-
-FIXME_unsorted() {
-    
-	#Copy the newly-constructed boot partition into the SD card image.
-	dd if=${WORKDIR}/boot.img of=${SDIMG} conv=notrunc seek=1 bs=$(expr ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync
-
-	#If the rootfs is compressed, uncompress it as we create the raw SD image.
-	if echo "${SDIMG_ROOTFS_TYPE}" | egrep -q "*\.xz"
-	then
-		xzcat ${SDIMG_ROOTFS} | dd of=${SDIMG} conv=notrunc seek=1 bs=$(expr 1024 \* ${BOOT_SPACE_ALIGNED} + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync
-	else
-		dd if=${SDIMG_ROOTFS} of=${SDIMG} conv=notrunc seek=1 bs=$(expr 1024 \* ${BOOT_SPACE_ALIGNED} + ${IMAGE_ROOTFS_ALIGNMENT} \* 1024) && sync && sync
-	fi
-
-	#Write the Secondary Program Loader (which runs before u-boot) and u-boot directly onto the SD card in the area where the A20 will look for it.
-	dd if=${DEPLOY_DIR_IMAGE}/u-boot-sunxi-with-spl.bin of=${SDIMG} bs=1024 seek=8 conv=notrunc
-    
 }
