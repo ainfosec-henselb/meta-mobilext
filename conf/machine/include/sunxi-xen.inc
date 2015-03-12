@@ -1,5 +1,4 @@
-PREFERRED_PROVIDER_virtual/bootloader = "uboot-sunxi-xen"
-#PREFERRED_VERSION_linux-libc-headers = "3.4.61"
+PREFERRED_PROVIDER_virtual/bootloader = "u-boot-sunxi-xen"
 
 #The sunxi-u-boot can boot both uImages and zImages, so we'll
 #use the more standard format. Note Xen loads zImages, so
