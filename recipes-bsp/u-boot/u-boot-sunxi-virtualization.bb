@@ -1,8 +1,9 @@
 # Copyright (C) 2015 Assured Information Security, Inc.
 # Author: Kyle J. Temkin <temkink@ainfosec.com>
 #
-# Universal Bootloader for Allwinner "SunXi" processors running the Xen hypervisor.
-#
+# Universal Bootloader for Allwinner "Sun XI" processors.
+# Modified to correctly boot in hypervisor mode.
+
 # Recipe released under the MIT license (see COPYING.MIT for the terms)
 
 inherit u-boot

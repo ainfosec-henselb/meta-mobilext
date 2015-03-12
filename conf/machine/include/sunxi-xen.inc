@@ -1,4 +1,4 @@
-PREFERRED_PROVIDER_virtual/bootloader = "u-boot-sunxi-xen"
+PREFERRED_PROVIDER_virtual/bootloader = "u-boot-sunxi-virtualization"
 
 #The sunxi-u-boot can boot both uImages and zImages, so we'll
 #use the more standard format. Note Xen loads zImages, so
