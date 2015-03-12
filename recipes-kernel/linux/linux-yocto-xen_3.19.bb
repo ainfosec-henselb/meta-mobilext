@@ -5,8 +5,8 @@ require recipes-kernel/linux/linux-yocto.inc
 LINUX_VERSION ?= "3.19"
 LINUX_VERSION_EXTENSION ?= "-mobilext-${LINUX_KERNEL_TYPE}"
 
-# FIXME: Replace me (and the defconfig entry below) with a single .cfg entry that contains all
-# of the necessary options! For now, we're using per-machine preconfigurations, as Xen (and its
+# FIXME: Append to the defconfig entry below with a single .cfg entry that contains all
+# of the Xen-necessary options! For now, we're using per-machine preconfigurations, as Xen (and its
 # per-machine requirements) is still a moving target.
 FILESPATH="${THISDIR}/${MACHINE}"
 
@@ -23,7 +23,7 @@ S = "${WORKDIR}/linux-${PV}"
 #For now, since we're hardcoding the individual devices, we'll have to manually list
 #them here. =( This should go away when the Xen configurations are pinned down
 #and abstracted out.
-COMPATIBLE_MACHINE = "cubietruck-dom0|generic-x86_64-xen|generic-x86_64-efi-xen|surface-pro-3-usb"
+COMPATIBLE_MACHINE = "cubietruck|generic-x86_64-xen|generic-x86_64-efi-xen|surface-pro-3-usb"
 
 
 #
