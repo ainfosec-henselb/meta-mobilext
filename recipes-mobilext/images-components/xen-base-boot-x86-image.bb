@@ -2,11 +2,14 @@
 # Author: Kyle J. Temkin <temkink@ainfosec.com>
 #
 # Released under the MIT license (see COPYING.MIT for the terms)
-#
-# Small boot partition for running Xen on an x86 system using
-# Syslinux as the bootloader. The resultant .hddimg can be written
-# directly to a partition.
-#
+
+SUMMARY = "Small boot partition for running Xen on an x86 system."
+DESCRIPTION = " \
+ Small boot partition for running Xen on an x86 system using \
+ syslinux or grub-efi as the bootloader. The resultant .hddimg can be \
+ written directly to a partition. \
+"
+AUTHOR = "Kyle J. Temkin <temkink@ainfosec.com>"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
@@ -124,4 +127,10 @@ build_xen_cfg() {
 populate() {
 	DEST=$1
 	install -d ${DEST}
+}
+
+#Create simple, toolchain-independent symlinks to the boot image that can be consumed by other images.
+do_bootimg_append() {
+  ln -sf ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}-${MACHINE}.hddimg
+  ln -sf ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg ${DEPLOY_DIR_IMAGE}/boot-${MACHINE}.hddimg
 }

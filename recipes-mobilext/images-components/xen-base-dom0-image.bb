@@ -10,6 +10,8 @@
 
 DESCRIPTION = "Root image for a simple Xen domain 0"
 
+PROVIDES += "virtual/dom0-image"
+
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
 
@@ -34,6 +36,12 @@ IMAGE_INSTALL += " \
 	fixmac \
 "
 
+
+#Override the list of aceptable fstypes with the image type
+#selected for dom0; assuming ext4 if none was provided.
+DOM0_IMAGE_TYPE ?= "ext4"
+IMAGE_FSTYPES = "${DOM0_IMAGE_TYPE}"
+
 TARGET_HOSTNAME = "mobilext-dom0"
 
 # Systemd journal is preferred.
@@ -48,3 +56,8 @@ export IMAGE_BASENAME = "xen-base-dom0"
 
 inherit override-hostname
 inherit image
+
+#Create simple, toolchain-independent symlinks to the boot image that can be consumed by other images.
+do_rootfs_append() {
+  ln -sf ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.${DOM0_IMAGE_TYPE} ${DEPLOY_DIR_IMAGE}/dom0-${MACHINE}.${DOM0_IMAGE_TYPE}
+}

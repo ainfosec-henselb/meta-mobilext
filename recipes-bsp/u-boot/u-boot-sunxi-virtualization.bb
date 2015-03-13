@@ -32,3 +32,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 # And name the binary that we should generate.
 SPL_BINARY="u-boot-sunxi-with-spl.bin"
 
+#Create a symlink with a standard naming convention, for consumption by other images.
+do_deploy_append() {
+  ln -sf ${DEPLOY_DIR_IMAGE}/${SPL_BINARY} ${DEPLOY_DIR_IMAGE}/u-boot-with-spl.bin
+  ln -sf ${DEPLOY_DIR_IMAGE}/${SPL_BINARY} ${DEPLOY_DIR_IMAGE}/bootloader-${MACHINE}.bin
+}

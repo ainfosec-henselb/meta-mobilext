@@ -2,11 +2,14 @@
 # Author: Kyle J. Temkin <temkink@ainfosec.com>
 #
 # Released under the MIT license (see COPYING.MIT for the terms)
-#
-# Small boot partition for running Xen on an x86 system using
-# Syslinux as the bootloader. The resultant .hddimg can be written
-# directly to a partition.
-#
+
+SUMMARY = "Small boot partition for running Xen on an ARM system."
+DESCRIPTION = " \
+ Small boot partition for running Xen on an ARM system using \
+ Das U-boot as the bootloader. The resultant .hddimg can be written \
+ directly to a partition. \
+"
+AUTHOR = "Kyle J. Temkin <temkink@ainfosec.com>"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
@@ -138,4 +141,8 @@ do_bootimg() {
 
   #Create the raw FAT image from the deployment directory.
 	build_fat_img ${HDDDIR} ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg
+
+  #Create a simple, toolchain-independent symlink to the boot image that can be consumed by other images.
+  ln -sf ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}-${MACHINE}.hddimg
+  ln -sf ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg ${DEPLOY_DIR_IMAGE}/boot-${MACHINE}.hddimg
 }
