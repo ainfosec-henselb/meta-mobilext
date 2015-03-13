@@ -50,10 +50,6 @@ BOOTLOADER = "${DEPLOY_DIR_IMAGE}/bootloader-${MACHINE}.bin"
 #Disk image size, in MiB.
 IMAGE_SIZE ?= "8192"
 
-# First partition begin at sector 2048 : 2048*1024 = 2097152
-PARTITION_ALIGNMENT = "2048"
-export LAST_PARTITION_END = "${PARTITION_ALIGNMENT}"
-
 #Decide the name for the target image.
 IMAGE_NAME   ?= "xen-base" 
 TARGET_IMAGE  = "${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.disk.img"
@@ -61,6 +57,9 @@ TARGET_IMAGE  = "${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.disk.img"
 #The type of the partition table to create.
 #Should be one of "aix", "amiga", "bsd", "dvh", "gpt", "loop", "mac", "msdos", "pc98", or "sun".
 PARTITION_TABLE_TYPE = "msdos"
+
+#Specify the location where the first partition should start.
+FIRST_PARTITION_START = "2048"
 
 
 #
@@ -74,9 +73,15 @@ add_partition_from_image() {
   #TODO: Automatically compute size!
   PARTITION_SIZE=$3
 
+  #If we've already recorded the start of the "free" disk space on a prior call,
+  #use our prerecorded value. Otherwise, this must be the first call, so we'll 
+  #assume the free space starts at the location where we want to place the first
+  #partition.
+  FREE_SPACE_START=${FREE_SPACE_START:-${FIRST_PARTITION_START}}
+
   #Compute the start and end for the given partition.
-  PARTITION_START=${LAST_PARTITION_END}
-  PARTITION_END=$(expr ${PARTITION_START} \+ ${PARTITION_SIZE})
+  PARTITION_START=${FREE_SPACE_START}
+  PARTITION_END=$(expr ${PARTITION_START} \+ ${PARTITION_SIZE} \- 1)
 
   #Add an empty partition to the image...
 	parted -s ${TARGET_IMAGE} unit KiB mkpart primary ${IMAGE_TYPE} ${PARTITION_START} ${PARTITION_END}
@@ -86,7 +91,7 @@ add_partition_from_image() {
   dd conv=notrunc if=${SOURCE} of=${TARGET_IMAGE} bs=1024 seek=${PARTITION_START} && sync && sync
 
   #Export the last partition's end for use by future add_partition calls.
-  export LAST_PARTITION_END=${PARTITION_END}
+  export FREE_SPACE_START=$(expr ${PARTITION_END} \+ 1)
   
 }
 
@@ -122,11 +127,13 @@ add_dom0_partition() {
 #
 # Add a VM storage partition to the target image.
 # This will be left empty, for the user.
+# <warning> This function uses the stateful LAST_PARTITION_END variable.</warning>
 #
 add_storage_partition() {
   
   #Add the empty partition which should fill up the remainder of the image.
-	parted -s ${TARGET_IMAGE} -- unit KiB mkpart primary fat32 ${LAST_PARTITION_END} -0
+  #(This will potentially lose the last KiB, but the -1 seems to be necessary for compatibility.)
+	parted -s ${TARGET_IMAGE} -- unit KiB mkpart primary fat32 ${FREE_SPACE_START} -1
 
   #FIXME: Format!
   #This will involve creating a large, sparse image and then copying it over. =(
@@ -156,10 +163,11 @@ do_image() {
   #Create and populate each of the partitions on the HDD image.
   add_boot_partition 
   add_dom0_partition
-  #add_storage_partition
+  add_storage_partition
 
   #... and install the bootloader onto the partition.
   install_bootloader
+
 }
 addtask do_image before do_build
 
