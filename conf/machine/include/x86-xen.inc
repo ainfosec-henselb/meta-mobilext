@@ -12,3 +12,6 @@ XEN_IMAGETYPE = "gzip"
 #Use a dynamically populated devfs, rather than a device tree on x86.
 USE_DEVFS = "1"
 
+#On x86, with an MSDOS partition table, the bootloader starts at the very first block.
+BOOTLOADER_START="0"
+

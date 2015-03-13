@@ -130,7 +130,11 @@ populate() {
 }
 
 #Create simple, toolchain-independent symlinks to the boot image that can be consumed by other images.
-do_bootimg_append() {
+create_standard_symlinks() {
   ln -sf ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg ${DEPLOY_DIR_IMAGE}/${IMAGE_BASENAME}-${MACHINE}.hddimg
   ln -sf ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.hddimg ${DEPLOY_DIR_IMAGE}/boot-${MACHINE}.hddimg
+}
+
+python do_bootimg_append() {
+    bb.build.exec_func('create_standard_symlinks', d)
 }
