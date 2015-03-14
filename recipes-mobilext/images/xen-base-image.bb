@@ -181,7 +181,7 @@ add_storage_partition() {
 # Populate the bootloader onto the HDD image's boot sector.
 #
 install_bootloader() {
-  dd conv=notrunc if=${BOOTLOADER} of=${TARGET_IMAGE} seek=${BOOTLOADER_START}
+  dd conv=notrunc if=${BOOTLOADER} of=${TARGET_IMAGE} seek=${BOOTLOADER_START} bs=1
 }
 
 #
