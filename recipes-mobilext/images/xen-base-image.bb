@@ -111,8 +111,9 @@ add_partition_from_image() {
   FREE_SPACE_START=${FREE_SPACE_START:-${FIRST_PARTITION_START}}
 
   #Compute the start and end for the given partition.
+  #Note that parte'd partition end is exclusive, so these form a [START,END) pair.
   PARTITION_START=${FREE_SPACE_START}
-  PARTITION_END=$(expr ${PARTITION_START} \+ ${PARTITION_SIZE} \- 1)
+  PARTITION_END=$(expr ${PARTITION_START} \+ ${PARTITION_SIZE})
 
   #Add an empty partition to the image...
 	parted -s ${TARGET_IMAGE} unit KiB mkpart primary ${IMAGE_TYPE} ${PARTITION_START} ${PARTITION_END}
@@ -122,8 +123,8 @@ add_partition_from_image() {
   dd conv=notrunc if=${SOURCE} of=${TARGET_IMAGE} bs=1024 seek=${PARTITION_START} && sync && sync
 
   #Export the last partition's end for use by future add_partition calls.
-  export FREE_SPACE_START=$(expr ${PARTITION_END} \+ 1)
-  
+  export FREE_SPACE_START=$(expr ${PARTITION_END})
+
 }
 
 #
