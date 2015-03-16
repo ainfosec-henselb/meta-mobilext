@@ -19,6 +19,8 @@ AUTHOR = "Kyle J. Temkin <temkink@ainfosec.com>"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
 
+SYSLINUX_LABEL="install"
+
 #Ensure that we have the partitioning tools used to create disk images.
 IMAGE_DEPENDS += " \
   parted-native \
@@ -27,11 +29,65 @@ IMAGE_DEPENDS += " \
   e2fsprogs-native \
 "
 
+#The path to the directory on the target image where the installation assets
+#(e.g. the rootfs to be placed on the target)
+INSTALL_ASSETS_PATH="${DEST}/install"
+
+BOOT_PARTITION_IMAGE ?= "xen-base-boot"
+DOM0_PARTITION_IMAGE ?= "xen-base-dom0"
+
 #Inherit the base class for building live images.
 inherit image-live
+
+
+#
+# Append each of the pieces that should be included for use by the installer.
+#
+populate_append() {
+    install -d ${INSTALL_ASSETS_PATH}
+
+    #Include the bootloader binary...
+    install -m 0644 ${DEPLOY_DIR_IMAGE}/bootloader-${MACHINE}.bin ${INSTALL_ASSETS_PATH}/bootloader.bin
+
+    #... the boot partition.
+    install -m 0644 ${DEPLOY_DIR_IMAGE}/${BOOT_PARTITION_IMAGE}-${MACHINE}.hddimg ${INSTALL_ASSETS_PATH}/boot-partition.hddimg
+
+    #... and the compressed dom0 rootfs.
+    install -m 0644 ${DEPLOY_DIR_IMAGE}/${DOM0_PARTITION_IMAGE}-${MACHINE}.tar.xz ${INSTALL_ASSETS_PATH}/dom0-rootfs.tar.xz
+}
+
 
 do_rootfs() {
     #TODO
     exit 0
 }
 addtask rootfs before build
+
+#
+# Skip building of an installer hard drive image?
+#
+build_hddimg() {
+    exit 0
+}
+
+#
+# Build the bootloader configuration necessary to start Xen.
+# This allows us to add LINUX_EXTRA_OPTIONS for serial install.
+#
+# TODO: See if this needs to implemented for grub; and potentially override that too.
+# Or, decide that serial debug isn't necessary for installer
+#
+
+#(These would look cleaner with Heredocs, but then I'd have to use tabs instead
+#of spaces, and no one wants that.)
+
+build_syslinux_cfg() {
+	echo ALLOWOPTIONS 1 > ${SYSLINUXCFG}
+	echo SERIAL 0 115200 >> ${SYSLINUXCFG}
+	echo DEFAULT ${SYSLINUX_LABEL} >> ${SYSLINUXCFG}
+	echo TIMEOUT ${SYSLINUX_TIMEOUT} >> ${SYSLINUXCFG}
+	echo PROMPT 1 >> ${SYSLINUXCFG}
+	echo LABEL ${SYSLINUX_LABEL} >> ${SYSLINUXCFG}
+	echo KERNEL /vmlinuz >> ${SYSLINUXCFG}
+	echo APPEND initrd=/initrd LABEL=install root=/dev/ram0 ${LINUX_EXTRA_OPTIONS} >> ${SYSLINUXCFG}
+}
