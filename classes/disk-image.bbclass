@@ -95,8 +95,6 @@ add_partition_from_image() {
     #Begin working with a new partition.
     PARTITION_NUMBER=$(expr ${PARTITION_NUMBER} \+ 1)
 
-    echo "Adding partition number ${PARTITION_NUMBER}."
-  
     #Compute the start and end for the given partition.
     #Note that parte'd partition end is exclusive, so these form a [START,END) pair.
     PARTITION_START=${FREE_SPACE_START}
