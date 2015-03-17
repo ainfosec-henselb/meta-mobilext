@@ -59,5 +59,15 @@ inherit image
 
 #Create simple, toolchain-independent symlinks to the boot image that can be consumed by other images.
 do_rootfs_append() {
-  ln -sf ${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.${DOM0_IMAGE_TYPE} ${DEPLOY_DIR_IMAGE}/dom0-${MACHINE}.${DOM0_IMAGE_TYPE}
+    for IMAGE_TYPE in ${IMAGE_FSTYPES}; do
+
+        #Compute the path the image will have, if it's been created...
+        SOURCE_IMAGE=${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.${IMAGE_TYPE}
+
+        #... and if it has been created, create our symlink.
+        if [[ -e $SOURCE_IMAGE ]]; then
+            ln -sf ${SOURCE_IMAGE} ${DEPLOY_DIR_IMAGE}/installer-${MACHINE}.${IMAGE_TYPE}
+        fi
+
+    done
 }
