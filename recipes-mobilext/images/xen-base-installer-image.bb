@@ -33,9 +33,8 @@ IMAGE_DEPENDS += " \
 INSTALLER_IMAGE = "virtual/installer-root-image"
 ROOTFS          = "${DEPLOY_DIR_IMAGE}/installer-${MACHINE}.ext4"
 
-
 #... and ensure the installer is built before we try to use it.
-#do_bootimg[depends] += "${INSTALLER_IMAGE}:do_rootfs"
+do_bootimg[depends] += "${INSTALLER_IMAGE}:do_rootfs"
 
 #The path to the directory on the target image where the installation assets
 #(e.g. the rootfs to be placed on the target)

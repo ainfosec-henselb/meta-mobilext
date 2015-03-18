@@ -18,31 +18,27 @@ AUTHOR = "Kyle J. Temkin <temkink@ainfosec.com>"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
 
+#Mark that this package can be used to provide a simple installer rootfs.
 PROVIDES += "virtual/installer-root-image"
 
-IMAGE_PREPROCESS_COMMAND = "rootfs_update_timestamp ;"
-
 # Select the components to be included in the installer's live environment. 
-IMAGE_INSTALL += " \
-	angstrom-packagegroup-boot \
-	packagegroup-basic \
-  kernel-modules \
-	fixmac \
+IMAGE_INSTALL += "\
+    packagegroup-core-boot \
+    mobilext-installer \ 
 "
 
+#For now, don't install agetty, as we use systemd tty control directly.
+BAD_RECOMMENDATIONS += "util-linux-agetty"
+
+# And ensure that this builds an ext4 image, as that's what our install environment
+# requies.
 IMAGE_FSTYPES += "ext4"
 
 #Set the target hostname to indicate that one is running inside
 #the installer. This is useful in development shells.
 TARGET_HOSTNAME = "mobilext-installer"
 
-# Systemd journal is preferred.
-BAD_RECOMMENDATIONS += "busybox-syslog"
-IMAGE_DEV_MANAGER   = "udev"
-IMAGE_INIT_MANAGER  = "systemd"
-IMAGE_INITSCRIPTS   = " "
-IMAGE_LOGIN_MANAGER = "busybox shadow"
-
+#Specify the pretty name for the image.
 export IMAGE_BASENAME = "mobilext-installer"
 
 inherit override-hostname
