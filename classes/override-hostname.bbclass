@@ -1,6 +1,6 @@
 
 #Adjust the image so it 
-IMAGE_PREPROCESS_COMMAND = "rootfs_override_hostname ;"
+IMAGE_PREPROCESS_COMMAND += "rootfs_override_hostname ;"
 
 #Override
 rootfs_override_hostname() {
