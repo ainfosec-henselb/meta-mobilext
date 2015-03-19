@@ -64,6 +64,7 @@ do_install() {
     install -d $(dirname "${DEST}")
 
     #... copy all of the installer scripts to the target directory, preserving rights.
+    #FIXME: Modify me to avoid copying in the .git directory!
     cp -pr "${S}" "${DEST}"
 
     #... and finally, install the systemd service that automatically starts

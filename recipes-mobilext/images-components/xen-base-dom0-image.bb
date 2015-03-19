@@ -66,7 +66,7 @@ do_rootfs_append() {
 
         #... and if it has been created, create our symlink.
         if [[ -e $SOURCE_IMAGE ]]; then
-            ln -sf ${SOURCE_IMAGE} ${DEPLOY_DIR_IMAGE}/installer-${MACHINE}.${IMAGE_TYPE}
+            ln -sf ${SOURCE_IMAGE} ${DEPLOY_DIR_IMAGE}/dom0-${MACHINE}.${IMAGE_TYPE}
         fi
 
     done
