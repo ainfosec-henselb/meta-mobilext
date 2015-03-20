@@ -29,7 +29,7 @@ IMAGE_INSTALL += "\
 "
 
 #... and ensure the requisite images are built before we try to use it.
-do_image[depends] += "\
+do_rootfs[depends] += "\
     virtual/boot-partition-image:do_bootimg \
     virtual/dom0-image:do_rootfs \
     virtual/bootloader:do_deploy \
