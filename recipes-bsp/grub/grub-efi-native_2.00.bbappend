@@ -4,6 +4,11 @@
 #
 EXTRA_OECONF += "--disable-werror"
 
+#Include a patch that fixes EFI services termination on some platforms
+#(including the Surface Pro 3).
+FILESEXTRAPATHS_prepend := "${THISDIR}/grub-2.00:"
+SRC_URI += "file://retry-efi-termination.patch"
+
 #
 # Adjust our makeimage procedure so it includes multiboot and gzio support,
 # for Xen.
