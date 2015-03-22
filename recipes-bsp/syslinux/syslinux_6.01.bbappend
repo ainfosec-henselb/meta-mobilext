@@ -6,6 +6,7 @@ PROVIDES += "virtual/bootloader"
 #
 do_deploy() {
     BOOTLOADER=${STAGING_DATADIR}/syslinux/mbr.bin
+    install -d ${DEPLOY_DIR_IMAGE}
     install ${BOOTLOADER} ${DEPLOY_DIR_IMAGE}/syslinux-mbr-${MACHINE}.bin
     install ${BOOTLOADER} ${DEPLOY_DIR_IMAGE}/bootloader-${MACHINE}.bin 
 }
