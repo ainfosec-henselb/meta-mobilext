@@ -133,6 +133,21 @@ configure_systemd_for_install() {
 IMAGE_PREPROCESS_COMMAND += "configure_systemd_for_install;"
 
 
+#
+# Fix /var/run for live systems.
+#
+fix_run_on_livecd() {
+    #Certain Angstrom distributions accidentally create a /var/run folder, and /then/
+    #attempt to run "ln -s /run /var/run". This creates /var/run/run, and run isn't writable.
+
+    #This quirk fixes this.
+    rm -rf ${IMAGE_ROOTFS}/var/run;
+    ln -s /run ${IMAGE_ROOTFS}/var/run;
+
+}
+IMAGE_PREPROCESS_COMMAND += "fix_run_on_livecd;"
+
+
 #Create simple, toolchain-independent symlinks to the boot image that can be consumed by other images.
 do_rootfs_append() {
     for IMAGE_TYPE in ${IMAGE_FSTYPES}; do
