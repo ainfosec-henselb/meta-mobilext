@@ -6,19 +6,54 @@ DESCRIPTION = " \
 "
 AUTHOR = "Kyle J. Temkin <temkink@ainfosec.com>"
 
-IMAGE_INSTALL = "initramfs-live-boot busybox udev base-passwd"
+LICENSE = "MIT"
 
-# Do not pollute the initrd image with rootfs features
+#Install the basic packages necessary to bootstarp our live installer.
+IMAGE_INSTALL = "\
+    initramfs-live-boot \
+    base-passwd \
+    busybox \
+    udev \
+"
+
+# Do not pollute the initrd image with rootfs features.
 IMAGE_FEATURES = ""
-
-export IMAGE_BASENAME = "core-image-minimal-initramfs"
 IMAGE_LINGUAS = ""
 
-LICENSE = "MIT"
+export IMAGE_BASENAME = "mobilext-installer-initramfs"
 
 IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
 inherit core-image
 
 IMAGE_ROOTFS_SIZE = "8192"
 
+
+#Don't pull the syslog daemon into our initramfs;
+#this will be handled by systemd.
 BAD_RECOMMENDATIONS += "busybox-syslog"
+
+#
+# Prepare the system for start up using systemd. Experimental. 
+#
+prepare_for_systemd() {
+    ln -s /run ${IMAGE_ROOTFS}/var/run 
+}
+ROOTFS_POSTPROCESS_COMMAND += "prepare_for_systemd ; "
+
+
+#
+#Create simple, toolchain-independent symlinks to the image that can be consumed by other images.
+#
+do_rootfs_append() {
+    for IMAGE_TYPE in ${IMAGE_FSTYPES}; do
+
+        #Compute the path the image will have, if it's been created...
+        SOURCE_IMAGE=${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.${IMAGE_TYPE}
+
+        #... and if it has been created, create our symlink.
+        if [[ -e $SOURCE_IMAGE ]]; then
+            ln -sf ${SOURCE_IMAGE} ${DEPLOY_DIR_IMAGE}/installer-initramfs-${MACHINE}.${IMAGE_TYPE}
+        fi
+
+    done
+}

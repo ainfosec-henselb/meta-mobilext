@@ -24,10 +24,12 @@ SYSLINUX_LABEL="boot"
 #... and ensure the installer and images are built before we try to use it.
 do_bootimg[depends] += "\
     virtual/installer-root-image:do_rootfs \
+    virtual/installer-initramfs-image:do_rootfs \
     virtual/kernel:do_deploy \
 "
 
 #Specify the name of the core installer rootfs used to perform the install
+INITRD = "${DEPLOY_DIR_IMAGE}/installer-initramfs-${MACHINE}.cpio.gz"
 ROOTFS = "${DEPLOY_DIR_IMAGE}/installer-${MACHINE}.ext4"
 
 #Inherit the base class for building live images.

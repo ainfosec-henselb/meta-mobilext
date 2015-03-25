@@ -28,6 +28,12 @@ IMAGE_INSTALL += "\
     coreutils \
 "
 
+#Configure the core packages that will set up this system.
+IMAGE_DEV_MANAGER   = "udev"
+IMAGE_INIT_MANAGER  = "systemd"
+IMAGE_INITSCRIPTS   = " "
+IMAGE_LOGIN_MANAGER = "busybox shadow"
+
 #... and ensure the requisite images are built before we try to use it.
 do_rootfs[depends] += "\
     virtual/boot-partition-image:do_bootimg \
@@ -38,6 +44,10 @@ do_rootfs[depends] += "\
 # And ensure that this builds an ext4 image, as that's what our install environment
 # requies.
 IMAGE_FSTYPES += "ext4"
+
+# Mark this image as being one that's used in read-only contexts.
+# (e.g. booted from a live CD).
+IMAGE_FEATURES += "read-only-rootfs"
 
 #Set the target hostname to indicate that one is running inside
 #the installer. This is useful in development shells.
@@ -122,15 +132,17 @@ IMAGE_PREPROCESS_COMMAND += "add_installer_images;"
 #
 # Configure systemd so the installer will run automatically.
 #
-configure_systemd_for_install() {
-    GETTY_TARGET_DIR="${IMAGE_ROOTFS}/etc/systemd/system/getty.target.wants"
+configure_image_for_installer() {
 
-    #Move the primary login getty to tty3; as we'll run an installer on tty1,
-    #and eventually display all log output on tty2.
-    mv "${GETTY_TARGET_DIR}/getty@tty1.service" "${GETTY_TARGET_DIR}/getty@tty3.service"
+    #... and configure our shell to automatically start the installer on the first tty...
+    echo 'cd /install/' >> ${IMAGE_ROOTFS}/etc/profile
+    echo '[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec ./install.sh' >> ${IMAGE_ROOTFS}/etc/profile
+
+    #... and display the raw installer output on the second tty.
+    echo '[[ -z $DISPLAY && $XDG_VTNR -eq 2]] && exec ./follow-install-log.sh' >> ${IMAGE_ROOTFS}/etc/profile
 
 }
-IMAGE_PREPROCESS_COMMAND += "configure_systemd_for_install;"
+IMAGE_PREPROCESS_COMMAND += "configure_image_for_installer;"
 
 
 #
@@ -143,6 +155,11 @@ fix_run_on_livecd() {
     #This quirk fixes this.
     rm -rf ${IMAGE_ROOTFS}/var/run;
     ln -s /run ${IMAGE_ROOTFS}/var/run;
+
+    #TEST: Remove the rootfs entry from our fstab, as it will be mounetd for us by
+    #the livecd initscripts. This should remove a benign FAILED message.
+    sed -i "/rootfs/ d" ${IMAGE_ROOTFS}/etc/fstab
+
 
 }
 IMAGE_PREPROCESS_COMMAND += "fix_run_on_livecd;"

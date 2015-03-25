@@ -35,15 +35,6 @@ RDEPENDS_${PN} = "\
   gpm \
 "
 
-#Allow this package to automatically register as a systemd service,
-#on systems with systemd.
-inherit systemd
-SYSTEMD_SERVICE_${PN} = "mobilext-installer.service"
-
-#By default, automatically start the MobileXT installer on system startup.
-MOBILEXT_INSTALLER_AUTOSTART ??= "true"
-SYSTEMD_AUTO_ENABLE = "${@base_conditional("MOBILEXT_INSTALLER_AUTOSTART", "true", "enable", "", d)}"
-
 #The target directory, relative to the package root.
 TARGET_DIRECTORY = "/install"
 
@@ -66,9 +57,4 @@ do_install() {
     #... copy all of the installer scripts to the target directory, preserving rights.
     #FIXME: Modify me to avoid copying in the .git directory!
     cp -pr "${S}" "${DEST}"
-
-    #... and finally, install the systemd service that automatically starts
-    #the installer on livecd boot.
-    install -d "${D}${systemd_unitdir}/system"
-    install -m 0644 "${S}/config/mobilext-installer.service" "${D}${systemd_unitdir}/system"
 }
