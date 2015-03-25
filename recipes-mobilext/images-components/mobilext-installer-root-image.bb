@@ -134,12 +134,17 @@ IMAGE_PREPROCESS_COMMAND += "add_installer_images;"
 #
 configure_image_for_installer() {
 
+    #Enable automatic root login on all gettys.
+    #Unfortunately, this is currently the recommended way to do this-- the only other option is to
+    #strip out authentication altogether by an equivalent modification of PAM's configuration.
+    sed -i "s/agetty --noclear/agetty --autologin root --noclear/" ${IMAGE_ROOTFS}${systemd_unitdir}/system/getty@.service
+
     #... and configure our shell to automatically start the installer on the first tty...
     echo 'cd /install/' >> ${IMAGE_ROOTFS}/etc/profile
     echo '[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec ./install.sh' >> ${IMAGE_ROOTFS}/etc/profile
 
     #... and display the raw installer output on the second tty.
-    echo '[[ -z $DISPLAY && $XDG_VTNR -eq 2]] && exec ./follow-install-log.sh' >> ${IMAGE_ROOTFS}/etc/profile
+    echo '[[ -z $DISPLAY && $XDG_VTNR -eq 2 ]] && exec ./follow-install-log.sh' >> ${IMAGE_ROOTFS}/etc/profile
 
 }
 IMAGE_PREPROCESS_COMMAND += "configure_image_for_installer;"
