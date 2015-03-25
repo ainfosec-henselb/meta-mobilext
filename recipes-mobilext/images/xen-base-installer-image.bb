@@ -39,12 +39,10 @@ inherit image-live
 
 #Ensure that the bootloader is configured as a live boot.
 #This instructs OE to run the live-image bootstrapping scripts.
-LABELS = "boot"
+SYSLINUX_LABELS = "boot"
 
-#
 # For now, don't create an installer rootfs, as the bootimg class pulls in an
 # existing rootfs.
-#
 do_rootfs() {
     exit 0
 }
