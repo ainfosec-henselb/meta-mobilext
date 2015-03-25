@@ -8,6 +8,9 @@ AUTHOR = "Kyle J. Temkin <temkink@ainfosec.com>"
 
 LICENSE = "MIT"
 
+#Mark this as a potential provider for the installer initramfs.
+PROVIDES += "virtual/installer-initramfs-image"
+
 #Install the basic packages necessary to bootstarp our live installer.
 IMAGE_INSTALL = "\
     initramfs-live-boot \
