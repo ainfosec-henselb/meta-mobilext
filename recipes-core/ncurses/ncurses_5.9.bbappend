@@ -3,6 +3,14 @@
 # support. This allows ncurses dialogs to be used in tablet installers.
 #
 
+#If we're building curses for a /target/, and not for the native SDK,
+#include GPM support. TODO: Base this off something like a touchscreen
+#machine feature?
+GPM_DEPENDS = "gpm"
+GPM_DEPENDS_virtclass-native = ""
+GPM_DEPENDS_virtclass-nativesdk = ""
+
+DEPENDS += "${GPM_DEPENDS}"
 
 # Helper function for do_configure to allow multiple configurations
 # $1 the directory to run configure in
@@ -15,7 +23,7 @@ ncurses_configure() {
 	        --disable-static \
 	        --without-debug \
 	        --without-ada \
-          --with-gpm \
+          --with-gpm=libgpm.so.2 \
 	        --enable-hard-tabs \
 	        --enable-xmc-glitch \
 	        --enable-colorfgbg \
