@@ -21,11 +21,19 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3
 #Mark that this package can be used to provide a simple installer rootfs.
 PROVIDES += "virtual/installer-root-image"
 
+#Include several hardware inspection utilities, which are useful to have in an installer.
+HW_INSPECTION_UTILITIES = "\
+    usbutils \
+    pciutils \
+    i2c-tools \
+"
+
 # Select the components to be included in the installer's live environment...
 IMAGE_INSTALL += "\
     packagegroup-core-boot \
     mobilext-installer \ 
     coreutils \
+    ${HW_INSPECTION_UTILITIES} \
 "
 
 #Configure the core packages that will set up this system.
