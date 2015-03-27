@@ -1,14 +1,27 @@
 DESCRIPTION = "GPM (General Purpose Mouse) is a mouse server \
 for the console and xterm, with sample clients included \
 (emacs, etc)."
+
 SECTION = "console/utils"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=18810669f13b87348459e611d31ab760"
 
-PR = "r0"
+#Create the GPM instance right from our custom git.
+SRC_URI = "\
+    git://github.com/mobilext/gpm.git;branch=add-evdev-absolute \
+    file://init \
+"
 
-SRC_URI = "http://www.nico.schottelius.org/software/gpm/archives/${PN}-${PV}.tar.gz \
-           file://init"
+#Use our per-version file directory for the version _minus_ our git data.
+FILESPATH = "${THISDIR}/gpm-1.20.7"
+
+#Automatically pull down newer commits from our git repository.
+SRCREV = "${AUTOREV}"
+PV = "1.20.7+git${SRCPV}"
+
+#... and work out of the git tree we've pulled down.
+S = "${WORKDIR}/git"
+
 
 inherit autotools update-rc.d
 
@@ -34,6 +47,9 @@ CFLAGS += "-Wno-extra -Wno-error=unused-but-set-parameter -Wno-error=unused-but-
 # /gpm-1.99.7/src/mice.c:221:5: error: (near initialization for 'mice[32].init') [-Werror]
 CFLAGS += "-Wno-error=int-to-pointer-cast -Wno-error"
 
+#
+# Run the auto-tools preconfiguration script, ensuring that we 
+#
 do_configure_prepend() {
     NOCONFIGURE=yes ./autogen.sh
 }
@@ -45,7 +61,5 @@ do_install () {
     install -m 0755 ${WORKDIR}/init ${D}/${sysconfdir}/init.d/gpm
     #cd ${D}${libdir} && ln -sf libgpm.so.1.19.0 libgpm.so.1
 }
-SRC_URI[md5sum] = "e9a4ba2711753c89b37950aada7aed4a"
-SRC_URI[sha256sum] = "c7e4661c24e05ae13547176b649bac8e3a0db2575f7dd57559f9e0b509f90f49"
 
 FILES_${PN} += "${datadir}/emacs"
