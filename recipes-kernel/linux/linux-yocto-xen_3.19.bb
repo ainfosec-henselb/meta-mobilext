@@ -23,7 +23,7 @@ S = "${WORKDIR}/linux-${PV}"
 #For now, since we're hardcoding the individual devices, we'll have to manually list
 #them here. =( This should go away when the Xen configurations are pinned down
 #and abstracted out.
-COMPATIBLE_MACHINE = "cubietruck|generic-x86_64-xen|generic-x86_64-efi-xen|surface-pro-3-usb"
+COMPATIBLE_MACHINE = "cubietruck|generic-x86_64-xen|generic-x86_64-efi-xen|surface-pro-3"
 
 
 #
