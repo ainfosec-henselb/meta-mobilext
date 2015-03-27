@@ -26,6 +26,7 @@ HW_INSPECTION_UTILITIES = "\
     usbutils \
     pciutils \
     i2c-tools \
+    evtest \
 "
 
 # Select the components to be included in the installer's live environment...
@@ -34,6 +35,12 @@ IMAGE_INSTALL += "\
     mobilext-installer \ 
     coreutils \
     ${HW_INSPECTION_UTILITIES} \
+"
+
+#Attempt to install the following, if they're provided,
+#(but don't raise an error or warning if they're not).
+IMAGE_INSTALL_ATTEMPTONLY += "\
+    virtual/installer-board-support \
 "
 
 #Configure the core packages that will set up this system.
