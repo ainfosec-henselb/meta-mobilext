@@ -39,7 +39,7 @@ IMAGE_INSTALL += "\
 
 #Attempt to install the following, if they're provided,
 #(but don't raise an error or warning if they're not).
-IMAGE_INSTALL_ATTEMPTONLY += "\
+PACKAGE_INSTALL_ATTEMPTONLY += "\
     virtual/installer-board-support \
 "
 
