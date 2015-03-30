@@ -27,5 +27,5 @@
 gpm -k
 
 #... and spawn one using the Surface Pro Touchscreen instead.
-gpm -m /dev/input-by-path/platform-INT33C3\:00-event -t evabs
+gpm -m /dev/input/by-path/platform-INT33C3\:00-event -t evabs -n
 
