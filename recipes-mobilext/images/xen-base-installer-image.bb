@@ -28,7 +28,7 @@ do_bootimg[depends] += "\
 #Specify the name of the core installer rootfs used to perform the install,
 #and the initramfs used to bootstrap it.
 INITRD = "${DEPLOY_DIR_IMAGE}/installer-initramfs-${MACHINE}.cpio.gz"
-ROOTFS = "${DEPLOY_DIR_IMAGE}/installer-${MACHINE}.ext4"
+ROOTFS = "${DEPLOY_DIR_IMAGE}/installer-${MACHINE}.squashfs"
 
 #Specify the name of the initramfs image to be used by the machine. This should
 #be the name of the package that produces the INITRD image used above.
@@ -40,6 +40,10 @@ inherit image-live
 #Ensure that the bootloader is configured as a live boot.
 #This instructs OE to run the live-image bootstrapping scripts.
 SYSLINUX_LABELS = "boot"
+
+APPEND       = "${INSTALLATION_BOOT_ARGUMENTS}"
+GRUB_OPTS    = "GRUB_HIDDEN_TIMEOUT_QUIET=true"
+GRUB_TIMEOUT = "3"
 
 # For now, don't create an installer rootfs, as the bootimg class pulls in an
 # existing rootfs.

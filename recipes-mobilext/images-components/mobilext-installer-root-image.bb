@@ -56,9 +56,9 @@ do_rootfs[depends] += "\
     virtual/bootloader:do_deploy \
 "
 
-# And ensure that this builds an ext4 image, as that's what our install environment
-# requies.
-IMAGE_FSTYPES += "ext4"
+# And ensure that this builds an squashfs image, as that's what our install environment
+# will use-- a compressed root image.
+IMAGE_FSTYPES += "squashfs"
 
 # Mark this image as being one that's used in read-only contexts.
 # (e.g. booted from a live CD).
@@ -115,6 +115,7 @@ generate_installer_configuration() {
     echo "export VERSION=\"${DISTRO_VERSION}\"" >> ${INSTALL_CONFIG}
     echo >> ${INSTALL_CONFIG}
     echo "export TARGET_DRIVE=\"${DEFAULT_INSTALLATION_DRIVE}\"" >> ${INSTALL_CONFIG}
+    echo "export TARGET_PARTITION_PREFIX=\"${DEFAULT_PARTITION_PREFIX}\"" >> ${INSTALL_CONFIG}
     echo >> ${INSTALL_CONFIG}
     echo "export BOOT_PARTITION_IMAGE=\"${BOOT_PARTITION_ROOTFS}\"" >> ${INSTALL_CONFIG}
     echo "export DOM0_PARTITION_IMAGE=\"${DOM0_PARTITION_ROOTFS}\"" >> ${INSTALL_CONFIG}
