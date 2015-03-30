@@ -30,6 +30,7 @@ RDEPENDS_${PN} = "\
   mtools \
   dosfstools \
   e2fsprogs \
+  e2fsprogs-mke2fs \
   util-linux \
   dialog \
   gpm \
