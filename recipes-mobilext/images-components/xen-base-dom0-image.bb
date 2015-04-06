@@ -36,6 +36,9 @@ IMAGE_INSTALL += " \
 	fixmac \
 "
 
+#Set the image free space according to the local configuration--
+#the desired free space may vary from machine to machine.
+IMAGE_ROOTFS_EXTRA_SPACE = "${DOM0_FREE_SPACE}"
 
 #Override the list of aceptable fstypes with the image type
 #selected for dom0; assuming ext4 if none was provided.
