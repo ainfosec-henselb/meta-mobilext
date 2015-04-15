@@ -9,6 +9,11 @@ inherit kernel-arch deploy
 #If we've built an EFI image, package it in the hypervisor package.
 FILES_${PN}-hypervisor = "/usr/lib64/efi/xen*.efi"
 
+#If the package is configured to use the system's QEMU, use the QEMU package rather than
+#building the QEMU provided with Xen.
+EXTRA_OECONF_remove = "--with-system-qemu=/usr/bin/qemu-system-i386"
+PACKAGECONFIG[system_qemu] = "--with-system-qemu=/usr/bin/qemu-system-i386,,,qemu"
+
 #
 # Set up configuration options according to our local setup.
 #
@@ -34,6 +39,12 @@ do_configure_prepend() {
     fi
 
   fi  
+}
+
+#Fix an error within the Xen tools' QEMU, which unfortunately sets an bad default
+#if PKG_CONFIG is not populated. We'll provide a saner default.
+do_compile_prepend() {
+    export PKG_CONFIG="pkg-config"
 }
 
 #
