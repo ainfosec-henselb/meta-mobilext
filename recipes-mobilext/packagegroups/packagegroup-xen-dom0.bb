@@ -17,32 +17,34 @@ RDEPENDS_packagegroup-xen-hypervisor = " \
     xen-hypervisor \
     "
 
+#
+# A package group that includes the main Xen tools.
+#
 RDEPENDS_packagegroup-xen-tools = " \
     xen-base \
+    xen-blktap \
+    xen-console \
+    xen-fsimage \
+    xen-misc \
+    xen-qemu \
+    xen-fsimage \
+    xen-scripts-block \
+    xen-scripts-common \
+    xen-scripts-network \
+    xen-udev \
+    xen-volatiles \
+    xen-xencommons \
+    xen-xendomains\
+    xen-xenmon \
+    xen-xenpmd \
+    xen-xenstore \
+    xen-xenstored \
+    xen-xentrace \
+    xen-xen-watchdog \
+    xen-xl \
     "
 
-#Potential packages to be added:
-# xen-dev \
-# xen-blktap \
-# xen-console \
-# xen-fsimage \
-# xen-misc \
-# xen-scripts-block \
-# xen-scripts-common \
-# xen-scripts-network \
-# xen-staticdev \
-# xen-udev \
-# xen-volatiles \
-# xen-xencommons \
-# xen-xendomains\
-# xen-xenmon \
-# xen-xenstore \
-# xen-xenstored \
-# xen-xentrace \
-# xen-xen-watchdog \
-# xen-xl \
-#
-#Packages not yet created:
+#Packages not yet created (?):
 # xen-flask 
 # xen-gdbsx 
 # xen-hvmloader 
@@ -71,14 +73,7 @@ RDEPENDS_packagegroup-xen-tools = " \
 # xen-libxlutil-dev 
 # xen-pygrub 
 # xen-python 
-# xen-qemu 
-# xen-remus 
 # xen-xcutils 
-# xen-xend 
-# xen-xend-examples 
-# xen-xendomains 
 # xen-xenpaging 
-# xen-xenpmd 
 # xen-xenstat 
-# xen-xm 
 
