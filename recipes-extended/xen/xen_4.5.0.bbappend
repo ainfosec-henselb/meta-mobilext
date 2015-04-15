@@ -29,6 +29,13 @@ do_configure_prepend() {
     
     #... enable debugging...
     echo "debug = y" >> $CONFIGFILE
+    echo "optimize = n" >> $CONFIGFILE
+
+
+    #... including the crash debugger, if we're not on ARM...
+    if [ x"${ARCH}" != x"arm" ]; then
+        echo "crash_debug = y" >> $CONFIGFILE
+    fi
 
     #... and enable the architecture-specific debug options.
     # Note that this is dependent on $ARCH, a Xen-specific variable (and not
