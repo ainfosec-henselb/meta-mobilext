@@ -32,6 +32,27 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 # And name the binary that we should generate.
 SPL_BINARY="u-boot-sunxi-with-spl.bin"
 
+#Set up the pieces needed for debugging u-boot.
+#(These are mostly used for the host's reference.)
+DEBUG_ELF        = "u-boot"
+FILES_${PN}-dbg += " \
+    /boot/${DEBUG_ELF} \
+    /boot/.debug \
+"
+
+#Skip the sanity checks that don't make sense for a binary running outside
+#of an OS environment.
+INSANE_SKIP_${PN} = "textrel, package_qa_hash_style"
+
+#
+# Copy the ELF file used to generate the core u-boot binary into our debug package.
+# We'll use this to debug u-boot with GDB.
+#
+do_install_append() {
+    install ${S}/${DEBUG_ELF} ${D}/boot/${DEBUG_ELF}
+}
+
+
 #Create a symlink with a standard naming convention, for consumption by other images.
 do_deploy_append() {
   ln -sf ${DEPLOY_DIR_IMAGE}/${SPL_BINARY} ${DEPLOY_DIR_IMAGE}/u-boot-with-spl.bin
