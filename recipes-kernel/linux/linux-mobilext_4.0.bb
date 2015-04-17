@@ -19,7 +19,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 #Once the xen-specific configuration fragments are broken out, we should be able
 #to drop the hard requirement of having hard-listing compatible machines by adding
 #per-machine configuration conditionally using an override in per-machine-additions.inc.
-COMPATIBLE_MACHINE = "cubietruck|generic-x86_64-xen|generic-x86_64-efi-xen|surface-pro-3"
+COMPATIBLE_MACHINE = "cubietruck|primo73|generic-x86_64-xen|generic-x86_64-efi-xen|surface-pro-3"
 
 #Use the basic OpenEmbedded method for building kernels.
 inherit kernel
