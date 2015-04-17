@@ -1,33 +1,53 @@
-inherit kernel
-require recipes-kernel/linux/linux-yocto.inc
+# Copyright (C) 2015 Assured Information Security, Inc.
+# Author: Kyle J. Temkin <temkink@ainfosec.com>
+#
+# Released under the MIT license (see COPYING.MIT for the terms)
 
-#... and grab the newest revision.
-LINUX_VERSION ?= "3.19"
-LINUX_VERSION_EXTENSION ?= "-mobilext-${LINUX_KERNEL_TYPE}"
+SUMMARY = "Linux Kernel for MobileXT supported platforms"
+DESCRIPTION = " \
+    This package provides a customized linux kernel which provides \
+    support for each of the MobileXT supported host platforms. \
+"
+AUTHOR = "Kyle J. Temkin <temkink@ainfosec.com>"
+SECTION = "kernel"
 
-# FIXME: Append to the defconfig entry below with a single .cfg entry that contains all
-# of the Xen-necessary options! For now, we're using per-machine preconfigurations, as Xen (and its
-# per-machine requirements) is still a moving target.
-FILESPATH="${THISDIR}/${MACHINE}"
+#License for the linux kernel itself.
+LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
-SRC_URI = " \
-    https://www.kernel.org/pub/linux/kernel/v3.x/linux-${PV}.tar.xz \
-    file://defconfig \
-    "
-
-SRC_URI[md5sum] = "d3fc8316d4d4d04b65cbc2d70799e763"
-SRC_URI[sha256sum] = "be42511fe5321012bb4a2009167ce56a9e5fe362b4af43e8c371b3666859806c"
-
-S = "${WORKDIR}/linux-${PV}"
-
-#For now, since we're hardcoding the individual devices, we'll have to manually list
-#them here. =( This should go away when the Xen configurations are pinned down
-#and abstracted out.
+#For now, we'll explicitly list each of the compatible machines.
+#Once the xen-specific configuration fragments are broken out, we should be able
+#to drop the hard requirement of having hard-listing compatible machines by adding
+#per-machine configuration conditionally using an override in per-machine-additions.inc.
 COMPATIBLE_MACHINE = "cubietruck|generic-x86_64-xen|generic-x86_64-efi-xen|surface-pro-3"
 
+#Use the basic OpenEmbedded method for building kernels.
+inherit kernel
+
+#Include support for device trees, and for explicit per-device customizations.
+require recipes-kernel/linux/linux-dtb.inc
+require recipes-kernel/linux/per-machine-additions.inc
+
+#Set up the linux kernel versionining information.
+LINUX_VERSION ?= "${PV}"
+LINUX_VERSION_EXTENSION ?= "-mobilext-${LINUX_KERNEL_TYPE}"
+
+#Use the release tarball that mathces our provided kernel version.
+SRC_URI = "https://www.kernel.org/pub/linux/kernel/v4.x/linux-${PV}.tar.xz"
+
+SRC_URI[md5sum] = "a86916bd12798220da9eb4a1eec3616d"
+SRC_URI[sha256sum] = "0f2f7d44979bc8f71c4fc5d3308c03499c26a824dd311fdf6eef4dee0d7d5991"
+
+#TODO: Break this into configuration fragments-- one that has the pieces contained
+#for a generic Xen dom0, and one that has the per-machine specific options.
+SRC_URI += "file://defconfig"
+
+#And work inside the directory where the kernel will be 
+S = "${WORKDIR}/linux-${PV}"
 
 #
-# Override kernel do-install with an upgrade 
+# The following code is taken directly from a newer version of the kernel base class. 
+# It should be removed once the usptream code is pulled down.
 #
 kernel_do_install() {
 	#
