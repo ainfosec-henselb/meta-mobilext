@@ -12,7 +12,7 @@ DESCRIPTION = " \
 AUTHOR = "Kyle J. Temkin <temkink@ainfosec.com>"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3b58"
+LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d690"
 
 #This package provides a boot partition image suitable for x86 machines.
 PROVIDES += "virtual/boot-partition-image"
