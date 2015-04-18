@@ -34,19 +34,8 @@ MACHINEOVERRIDES .= ":${@bb.data.getVar('FEED_ARCH', d,1).replace('all','noarch'
 #INHERIT += "src_distribute_local"
 SRC_DIST_LOCAL ?= "symlink"
 
-# Can be "glibc", "eglibc" or "uclibc"
-TCLIBC ?= "eglibc"
-
-# The things *libc can provide.
-PREFERRED_PROVIDER_virtual/libc = "${TCLIBC}"
-PREFERRED_PROVIDER_eglibc = "eglibc"
-PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}libc-initial = "${TCLIBC}-initial"
-PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}libc-for-gcc = "${TCLIBC}"
-
-# And the same as above for the nativesdk
-PREFERRED_PROVIDER_virtual/libc-nativesdk = "${TCLIBC}-nativesdk"
-PREFERRED_PROVIDER_virtual/${SDK_PREFIX}libc-initial-nativesdk = "${TCLIBC}-initial-nativesdk"
-PREFERRED_PROVIDER_virtual/${SDK_PREFIX}libc-for-gcc-nativesdk = "${TCLIBC}-nativesdk"
+# Can be "glibc", "musl" or "uclibc"
+TCLIBC ?= "glibc"
 
 PREFERRED_PROVIDER_virtual/gettext ??= "gettext"
 PREFERRED_PROVIDER_linux-libc-headers-nativesdk = "linux-libc-headers-nativesdk"
@@ -56,9 +45,6 @@ require conf/distro/include/angstrom-${TCLIBC}.inc
 # Set some java bits
 require conf/distro/include/angstrom-java.inc
 require conf/distro/include/angstrom-jalimo.conf
-
-# Mesa config
-require conf/distro/include/angstrom-mesa-tweaks.inc
 
 # ARM920T and up can use thumb mode to decrease binary size at the expense of speed
 # (the complete story is a bit more nuanced due to cache starvation)
@@ -122,6 +108,7 @@ INHERIT += "sstate"
 ANGSTROM_PKG_FORMAT ?= "ipk"
 require conf/distro/include/angstrom-package-${ANGSTROM_PKG_FORMAT}.inc
 
+
 # MACHINE_KERNEL_PR if not defined can cause parsing failures
 # since MACHINE_KERNEL_PR is used in PR assignments in some recipes
 # (meta-ti comes to mind) which means when creating FILESPATH
@@ -137,6 +124,7 @@ ARM_KEEP_OABI = "0"
 # Do keep OABI compat for om-gta01 to keep the gllin binary working
 ARM_KEEP_OABI_pn-linux-openmoko-2.6.24_om-gta01 = "1"
 ARM_KEEP_OABI_pn-linux-openmoko-2.6.28_om-gta01 = "1"
+
 
 #Generate locales on the buildsystem instead of on the target. Speeds up first boot, set to "1" to enable
 PREFERRED_PROVIDER_qemu-native = "qemu-native"
@@ -170,39 +158,14 @@ VIRTUAL-RUNTIME_init_manager = "systemd"
 # Uncomment to completely disable support for sysv scripts:
 #PACKAGECONFIG_pn-systemd = "xz"
 
-PACKAGECONFIG_pn-qtbase = " \
-    release \
-    dbus \
-    udev \
-    evdev \
-    widgets \
-    ${PACKAGECONFIG_OPENSSL} \
-    ${PACKAGECONFIG_GL} \
-    ${PACKAGECONFIG_FB} \
-    ${PACKAGECONFIG_X11} \
-    ${PACKAGECONFIG_FONTS} \
-    ${PACKAGECONFIG_SYSTEM} \
-    ${PACKAGECONFIG_MULTIMEDIA} \
-    ${PACKAGECONFIG_DISTRO} \
-    icu \
-    glib \
-    jpeg \
-    gstreamer \
-    linuxfb \
-    sql-sqlite \
-    alsa \
-"
-
 # USE-flag like features
 DISTRO_FEATURES += "tk"
 DISTRO_FEATURES += "x11"
-DISTRO_FEATURES += "wayland"
 DISTRO_FEATURES += "3g"
 DISTRO_FEATURES += "pulseaudio"
 
 # OpenGL support
 DISTRO_FEATURES += "opengl"
-PREFERRED_PROVIDER_virtual/libgl ?= "mesa-gl"
 
 # Inherit the default LIBC features superset from OE-core
 DISTRO_FEATURES += "${DISTRO_FEATURES_LIBC}"

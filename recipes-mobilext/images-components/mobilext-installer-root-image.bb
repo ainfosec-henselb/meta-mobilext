@@ -39,9 +39,9 @@ IMAGE_INSTALL += "\
 
 #Attempt to install the following, if they're provided,
 #(but don't raise an error or warning if they're not).
-PACKAGE_INSTALL_ATTEMPTONLY += "\
-    virtual/installer-board-support \
-"
+#PACKAGE_INSTALL_ATTEMPTONLY += "\
+#    virtual/installer-board-support \
+#"
 
 #Configure the core packages that will set up this system.
 IMAGE_DEV_MANAGER   = "udev"
@@ -73,6 +73,7 @@ export IMAGE_BASENAME = "mobilext-installer"
 
 inherit override-hostname
 inherit image
+inherit deploy
 
 #Specify the names of the partition files that should be installed.
 #These will be copied into an installer-accesible location.
@@ -187,7 +188,8 @@ IMAGE_PREPROCESS_COMMAND += "fix_run_on_livecd;"
 
 
 #Create simple, toolchain-independent symlinks to the boot image that can be consumed by other images.
-do_rootfs_append() {
+do_deploy() {
+
     for IMAGE_TYPE in ${IMAGE_FSTYPES}; do
 
         #Compute the path the image will have, if it's been created...
@@ -200,3 +202,4 @@ do_rootfs_append() {
 
     done
 }
+addtask do_deploy after do_rootfs

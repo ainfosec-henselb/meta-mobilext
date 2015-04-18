@@ -27,6 +27,7 @@ export IMAGE_BASENAME = "mobilext-installer-initramfs"
 
 IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
 inherit core-image
+inherit deploy
 
 IMAGE_ROOTFS_SIZE = "8192"
 
@@ -47,7 +48,7 @@ ROOTFS_POSTPROCESS_COMMAND += "prepare_for_systemd ; "
 #
 #Create simple, toolchain-independent symlinks to the image that can be consumed by other images.
 #
-do_rootfs_append() {
+do_deploy() {
     for IMAGE_TYPE in ${IMAGE_FSTYPES}; do
 
         #Compute the path the image will have, if it's been created...
@@ -60,3 +61,4 @@ do_rootfs_append() {
 
     done
 }
+addtask do_deploy after do_rootfs

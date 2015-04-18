@@ -59,9 +59,10 @@ export IMAGE_BASENAME = "xen-base-dom0"
 
 inherit override-hostname
 inherit image
+inherit deploy
 
 #Create simple, toolchain-independent symlinks to the boot image that can be consumed by other images.
-do_rootfs_append() {
+do_deploy() {
     for IMAGE_TYPE in ${IMAGE_FSTYPES}; do
 
         #Compute the path the image will have, if it's been created...
@@ -74,3 +75,4 @@ do_rootfs_append() {
 
     done
 }
+addtask do_deploy after do_rootfs
