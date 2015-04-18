@@ -54,3 +54,13 @@ do_install() {
 	install -d ${D}${bindir}
 	install -m 0755 ${WORKDIR}/lsb_release ${D}${bindir}/
 }
+
+
+
+RPROVIDES_${PN} = "os-release"
+RREPLACES_${PN} = "os-release"
+RCONFLICTS_${PN} = "os-release"
+
+RPROVIDES_${PN} = "angstrom-version"
+RREPLACES_${PN} = "angstrom-version"
+RCONFLICTS_${PN} = "angstrom-version"
