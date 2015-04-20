@@ -6,6 +6,10 @@
 
 # Recipe released under the MIT license (see COPYING.MIT for the terms)
 
+#
+# TODO: Try to replace me with upstream u-boot!
+#
+
 inherit u-boot
 
 LICENSE = "GPLv2"
@@ -15,9 +19,6 @@ PROVIDES += "virtual/bootloader"
 
 #Depend on the ability to create u-boot images.
 
-#
-# TODO: Get the virtualization changes merged into SunXI, so everything will work!
-#
 SRC_URI = "git://github.com/MobileXT/u-boot-sunxi-virtualization.git;branch=sunxi-next;protocol=git"
 
 #Set up the build environment...
@@ -30,7 +31,7 @@ SRCREV = "${AUTOREV}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # And name the binary that we should generate.
-SPL_BINARY="u-boot-sunxi-with-spl.bin"
+export SPL_BINARY = "u-boot-sunxi-with-spl.bin"
 
 #Set up the pieces needed for debugging u-boot.
 #(These are mostly used for the host's reference.)
@@ -55,6 +56,9 @@ do_install_append() {
 
 #Create a symlink with a standard naming convention, for consumption by other images.
 do_deploy_append() {
-  ln -sf ${DEPLOY_DIR_IMAGE}/${SPL_BINARY} ${DEPLOY_DIR_IMAGE}/u-boot-with-spl.bin
-  ln -sf ${DEPLOY_DIR_IMAGE}/${SPL_BINARY} ${DEPLOY_DIR_IMAGE}/bootloader-${MACHINE}.bin
+    if [ x"${SPL_BINARY}" != x ]; then
+        install -d ${DEPLOY_DIR_IMAGE}
+        ln -sf ${DEPLOY_DIR_IMAGE}/${SPL_BINARY} ${DEPLOY_DIR_IMAGE}/u-boot-with-spl.bin
+        ln -sf ${DEPLOY_DIR_IMAGE}/${SPL_BINARY} ${DEPLOY_DIR_IMAGE}/bootloader-${MACHINE}.bin
+    fi
 }
