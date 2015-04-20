@@ -40,7 +40,7 @@ TCLIBC ?= "glibc"
 PREFERRED_PROVIDER_virtual/gettext ??= "gettext"
 PREFERRED_PROVIDER_linux-libc-headers-nativesdk = "linux-libc-headers-nativesdk"
 
-require conf/distro/include/angstrom-${TCLIBC}.inc
+require conf/distro/include/mobilext-${TCLIBC}.inc
 
 # Set some java bits
 require conf/distro/include/angstrom-java.inc
