@@ -27,16 +27,6 @@ IMAGE_INSTALL += " \
   kernel-devicetree \
 	kernel-image \
 "
-#And ensure we have all the dependencies necessary to create our image.
-IMAGE_DEPENDS += " \
-  parted-native \
-  mtools-native \
-  dosfstools-native \
-  virtual/bootloader \
-  u-boot-mkimage-native \
-  virtual/kernel \
-  xen \
-"
 
 #Specify the files that will be used in the creation of this recipe,
 #(but which are not provided by another package.)
@@ -52,8 +42,10 @@ inherit bootimg
 #needed by the boot-image-creation. Note that we do not append,
 #as we want to override the base class's dependence on syslinux.
 do_bootimg[depends] = " \
+  u-boot-mkimage-native:do_populate_sysroot \
   dosfstools-native:do_populate_sysroot \
   mtools-native:do_populate_sysroot \
+  parted-native:do_populate_sysroot \
   virtual/kernel:do_deploy \
   virtual/bootloader:do_deploy \
   ${PN}:do_unpack \
@@ -74,7 +66,7 @@ populate() {
 
 	#Populate the linux kernel image and device tree.
   #TODO: Change device tree extension to DTB.
-  install -m 0644 ${STAGING_KERNEL_DIR}/${KERNEL_IMAGETYPE}  ${DEST}/linux-${KERNEL_IMAGETYPE}
+  install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}  ${DEST}/linux-${KERNEL_IMAGETYPE}
   install -m 0644 ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${KERNEL_DEVICETREE} ${DEST}/deviceTree
 
 	#Add a small file identifying the current build.
