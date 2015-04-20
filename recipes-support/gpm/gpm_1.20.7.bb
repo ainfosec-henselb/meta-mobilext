@@ -23,7 +23,7 @@ PV = "1.20.7+git${SRCPV}"
 S = "${WORKDIR}/git"
 
 
-inherit autotools update-rc.d
+inherit autotools-brokensep update-rc.d
 
 INITSCRIPT_NAME = "gpm"
 INITSCRIPT_PARAMS = "defaults"
@@ -48,10 +48,12 @@ CFLAGS += "-Wno-extra -Wno-error=unused-but-set-parameter -Wno-error=unused-but-
 CFLAGS += "-Wno-error=int-to-pointer-cast -Wno-error"
 
 #
-# Run the auto-tools preconfiguration script, ensuring that we 
+# Configure using old-style autotools configuration; as GPM doesn't match
+# the OE hueristic.
 #
-do_configure_prepend() {
+do_configure() {
     NOCONFIGURE=yes ./autogen.sh
+    oe_runconf
 }
 
 do_install () {
