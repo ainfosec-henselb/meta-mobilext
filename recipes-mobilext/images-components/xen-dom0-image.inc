@@ -53,8 +53,6 @@ IMAGE_INIT_MANAGER  = "systemd"
 IMAGE_INITSCRIPTS   = " "
 IMAGE_LOGIN_MANAGER = "busybox shadow"
 
-export IMAGE_BASENAME = "xen-base-dom0"
-
 inherit override-hostname
 inherit image
 inherit deploy
