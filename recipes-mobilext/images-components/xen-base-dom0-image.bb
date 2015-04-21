@@ -17,6 +17,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3
 
 IMAGE_PREPROCESS_COMMAND = "rootfs_update_timestamp ;"
 
+#Enable development features.
+IMAGE_FEATURES += "empty-root-password debug-tweaks"
+
 DISTRO_UPDATE_ALTERNATIVES ??= ""
 ROOTFS_PKGMANAGE_PKGS ?= '${@base_conditional("ONLINE_PACKAGE_MANAGEMENT", "none", "", "${ROOTFS_PKGMANAGE} ${DISTRO_UPDATE_ALTERNATIVES}", d)}'
 
@@ -63,6 +66,7 @@ inherit deploy
 
 #Create simple, toolchain-independent symlinks to the boot image that can be consumed by other images.
 do_deploy() {
+
     for IMAGE_TYPE in ${IMAGE_FSTYPES}; do
 
         #Compute the path the image will have, if it's been created...
@@ -75,4 +79,4 @@ do_deploy() {
 
     done
 }
-addtask do_deploy after do_rootfs
+addtask do_deploy after do_rootfs before do_build
