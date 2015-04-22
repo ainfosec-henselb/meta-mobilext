@@ -24,4 +24,4 @@ IMAGE_NAME = "xen-demo"
 require xen-image.inc
 
 #And use our minimal dom0 image.
-PREFERRED_PROVIDER_virtual/dom0_image = "xen-demo-dom0-image"
+PREFERRED_PROVIDER_virtual/dom0-image = "xen-demo-dom0-image"
