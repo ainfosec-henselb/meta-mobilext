@@ -10,9 +10,9 @@ DESCRIPTION = " \
     to get a graphical view of each guest domain. This is not intended as a basis for a \
     secure platform-- it currently runs a full X server in the control domain. \
     \
-    To make demonstrations and modification easier, this image contains a development environment \
-    which can be used to create simple demo applets, where necessary. If you create something neat, \
-    consider creating a BitBake recipe for it!. \
+    The image also contains a few development tools intended to be useful in scoping out \
+    platform hardware and diagnosing hardware issues. This allows the demonstration image \
+    to also act as a useful test of platform features. \
 "
 AUTHOR = "Kyle J. Temkin <temkink@ainfosec.com>"
 
@@ -21,8 +21,10 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3
 
 require xen-dom0-image.inc
 
-#Group together the packages Angstrom includes in its XFCE development image.
-ANGSTROM_XFCE_DEV_PACKAGES += " \
+#Group together the packages Angstrom includes in its XFCE development image,
+#minus the large SDK image. The remainder of the tools may be useful in bringing
+#hardware support to new platforms.
+ANGSTROM_XFCE_PACKAGES += " \
 	xinput-calibrator \
 	systemd-analyze \
 	\
@@ -33,8 +35,6 @@ ANGSTROM_XFCE_DEV_PACKAGES += " \
 	angstrom-gnome-icon-theme-enable gtk-engine-clearlooks gtk-theme-clearlooks angstrom-clearlooks-theme-enable \
 	\
 	angstrom-gdm-autologin-hack angstrom-gdm-xfce-hack gdm \
-	\
-	packagegroup-sdk-target \
 	\
 	bash \
   pciutils \
@@ -83,7 +83,7 @@ GUEST_VM_DEMO_PACKAGES = ""
 
 
 IMAGE_INSTALL += "\
-    ${ANGSTROM_XFCE_DEV_PACKAGES} \
+    ${ANGSTROM_XFCE_PACKAGES} \
     ${GUEST_VM_DEMO_PACKAGES} \
 "
 
