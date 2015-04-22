@@ -26,7 +26,7 @@ PARTITION_ALIGNMENT   ?= "2048"
 
 #If we haven't been provided a disk image size, assume 8 GiB.
 #Disk image size, in MiB.
-IMAGE_SIZE            ?= "8192"
+IMAGE_SIZE            ?= "2048"
 
 #Assume we're not writing a bootloader, unless otherwise specified.
 BOOTLOADER            ?= ""
