@@ -1,0 +1,24 @@
+From e2bfae75221d09c3171ea9687796ee651d0f1d2b Mon Sep 17 00:00:00 2001
+From: "Kyle J. Temkin" <temkink@ainfosec.com>
+Date: Wed, 22 Apr 2015 13:14:42 -0400
+Subject: [PATCH] Fix broken macro.
+
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1c3f0cd..7db422f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -31,7 +31,6 @@ AC_PROG_LIBTOOL
+ # *****
+ 
+ GNOME_COMMON_INIT
+-GNOME_DEBUG_CHECK
+ GNOME_COMPILE_WARNINGS([maximum])
+ GNOME_MAINTAINER_MODE_DEFINES
+ 
+-- 
+2.1.3
+
