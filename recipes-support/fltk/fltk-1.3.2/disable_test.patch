@@ -1,0 +1,25 @@
+From b05c08f2dd0df7fe6cfff056c688343386748bf5 Mon Sep 17 00:00:00 2001
+From: Kyle Temkin <ktemkin@binghamton.edu>
+Date: Fri, 24 Apr 2015 19:27:53 -0400
+Subject: [PATCH] Disable test.
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index c161845..3a368ce 100644
+--- a/Makefile
++++ b/Makefile
+@@ -18,7 +18,7 @@
+ 
+ include makeinclude
+ 
+-DIRS = $(IMAGEDIRS) src $(CAIRODIR) fluid test documentation
++DIRS = $(IMAGEDIRS) src $(CAIRODIR) fluid documentation
+ 
+ all: makeinclude fltk-config
+ 	for dir in $(DIRS); do\
+-- 
+2.3.6
+

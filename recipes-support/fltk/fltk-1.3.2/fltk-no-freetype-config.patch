@@ -1,0 +1,32 @@
+From 32730fdc61971989d1285f27cc870c33970e3191 Mon Sep 17 00:00:00 2001
+From: Kyle Temkin <ktemkin@binghamton.edu>
+Date: Fri, 24 Apr 2015 19:16:49 -0400
+Subject: [PATCH] Don't use freetype.
+
+---
+ configure.in | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 190c082..fe8956e 100644
+--- a/configure.in
++++ b/configure.in
+@@ -973,11 +973,11 @@ case $uname_GUI in
+         AC_ARG_ENABLE(xft, [  --enable-xft            turn on Xft support [default=yes]])
+ 
+ 	if test x$enable_xft != xno; then
+-            AC_PATH_PROG(FTCONFIG,freetype-config)
++            AC_PATH_PROG(PKGCONFIG,pkg-config)
+ 
+-	    if test "x$FTCONFIG" != x; then
+-	        CPPFLAGS="`$FTCONFIG --cflags` $CPPFLAGS"
+-	        CXXFLAGS="`$FTCONFIG --cflags` $CXXFLAGS"
++	    if test "x$PKGCONFIG" != x; then
++	        CPPFLAGS="`$PKGCONFIG --cflags` $CPPFLAGS"
++	        CXXFLAGS="`$PKGCONFIG --cflags` $CXXFLAGS"
+ 
+ 	        AC_CHECK_LIB(fontconfig, FcPatternCreate)
+ 		AC_CHECK_HEADER(X11/Xft/Xft.h,
+-- 
+2.3.6
+
