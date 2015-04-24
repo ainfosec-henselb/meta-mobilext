@@ -20,8 +20,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=4d92cd373abda3937c2bc47fbc49d
 
 IMAGE_NAME = "xen-demo"
 
+#Use the demo image's dom0 as our core rootfs.
+DOM0_IMAGE = "xen-demo-dom0-image"
+
 #Build a basic Xen image.
 require xen-image.inc
-
-#And use our minimal dom0 image.
-PREFERRED_PROVIDER_virtual/dom0-image = "xen-demo-dom0-image"

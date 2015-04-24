@@ -66,8 +66,8 @@ do_deploy() {
         SOURCE_IMAGE=${DEPLOY_DIR_IMAGE}/${IMAGE_NAME}.rootfs.${IMAGE_TYPE}
 
         #... and if it has been created, create our symlink.
-        if [[ -e $SOURCE_IMAGE ]]; then
-            ln -sf ${SOURCE_IMAGE} ${DEPLOY_DIR_IMAGE}/dom0-${MACHINE}.${IMAGE_TYPE}
+        if [[ -e ${SOURCE_IMAGE} ]]; then
+            ln -sf ${SOURCE_IMAGE} ${DEPLOY_DIR_IMAGE}/${PN}-${MACHINE}.${IMAGE_TYPE}
         fi
 
     done
