@@ -20,5 +20,27 @@ SRCREV = "${AUTOREV}"
 #Compile directly in the folder we've pulled down from git.
 S = "${WORKDIR}/git"
 
-#TODO: Get the desktop and icon files packaged in nicely!
-#TODO: Split this package into server and viewer components.
+#
+# Install the desktop file and its icons.
+#
+do_install_append() {
+
+    #Install the desktop file...
+    install -D ${S}/contrib/packages/rpm/el6/SOURCES/vncviewer.desktop \
+        ${D}/usr/share/applications/vncviewer.desktop
+
+    #Iterate over each of the provided icons...
+    for ICON in ${S}/media/icons/tigervnc_*.png; do
+
+        #... extract the icon's size...
+        SIZE=$(basename ${ICON} | grep -o "[0-9]*")
+
+        echo ICON: ${ICON} $ICON
+        echo SIZE: ${SIZE} $SIZE
+
+        #... and copy the icon to the correct location.
+        echo install -D ${ICON} ${D}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/tigervnc.png
+        install -D ${ICON} ${D}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/tigervnc.png
+    done
+
+}
