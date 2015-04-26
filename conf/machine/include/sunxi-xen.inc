@@ -2,7 +2,7 @@ PREFERRED_PROVIDER_virtual/bootloader = "u-boot"
 
 #Ensure that we get a version of u-boot that's new enough to properly 
 #support the virtualization extensions.
-PREFERRED_VERSION_u-boot = "v2015.01%"
+PREFERRED_VERSION_u-boot = "v2015.04%"
 
 #The sunxi-u-boot can boot both uImages and zImages, so we'll
 #use the more standard format. Note Xen loads zImages, so
