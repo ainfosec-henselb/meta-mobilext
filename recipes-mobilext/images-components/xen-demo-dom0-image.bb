@@ -77,10 +77,13 @@ ANGSTROM_XFCE_PACKAGES += " \
   	python-core python-modules \
 "
 
-#TODO: Include all of the packages necessary to view guest VMs.
-GUEST_VM_DEMO_PACKAGES = ""
-
-
+#
+# Demonstration packages, which are useful for demonstrating the functionality of
+# the Xen base platform.
+#
+GUEST_VM_DEMO_PACKAGES = " \
+    tightvnc \
+"
 
 IMAGE_INSTALL += "\
     ${ANGSTROM_XFCE_PACKAGES} \
