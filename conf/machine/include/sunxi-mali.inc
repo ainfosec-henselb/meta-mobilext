@@ -4,6 +4,11 @@ PREFERRED_PROVIDER_virtual/libgles1 ?= "sunxi-mali"
 PREFERRED_PROVIDER_virtual/libgles2 ?= "sunxi-mali"
 PREFERRED_PROVIDER_virtual/egl ?= "sunxi-mali"
 
+#Override the meta-sunxi logic that restricts use of sunxi-mali to the
+#machines in the meta-sunxi layer. Instead, we'll allow machines that
+#include this file to build sunxi-mali, as well.
+COMPATIBLE_MACHINE_pn-sunxi-mali .= "(${MACHINE})"
+
 XSERVER = " \
     xserver-xorg \
     xf86-video-fbturbo \
