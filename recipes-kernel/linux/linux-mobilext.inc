@@ -36,7 +36,7 @@ LINUX_VERSION_EXTENSION ?= "-mobilext-${LINUX_KERNEL_TYPE}"
 
 #TODO: Break this into configuration fragments-- one that has the pieces contained
 #for a generic Xen dom0, and one that has the per-machine specific options.
-SRC_URI_append = "file://defconfig"
+SRC_URI_append = " file://defconfig"
 
 #And work inside the directory where the kernel will be 
 S = "${WORKDIR}/linux-${PV}"
