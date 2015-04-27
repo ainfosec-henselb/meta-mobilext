@@ -86,7 +86,7 @@ ANGSTROM_XFCE_PACKAGES += " \
 # the Xen base platform.
 #
 GUEST_VM_DEMO_PACKAGES = " \
-    tightvnc \
+    tigervnc \
     florence \
 "
 
