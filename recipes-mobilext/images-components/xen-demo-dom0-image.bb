@@ -75,6 +75,10 @@ ANGSTROM_XFCE_PACKAGES += " \
   	btrfs-tools \
   	\
   	python-core python-modules \
+    \
+    connman \
+    connman-client \
+    connman-tools \
 "
 
 #
@@ -83,6 +87,7 @@ ANGSTROM_XFCE_PACKAGES += " \
 #
 GUEST_VM_DEMO_PACKAGES = " \
     tightvnc \
+    florence \
 "
 
 IMAGE_INSTALL += "\
@@ -98,3 +103,20 @@ do_delete_gnome_session () {
 	rm -f ${IMAGE_ROOTFS}${datadir}/xsessions/gnome.desktop
 }
 
+
+#
+# Configure the system so the demo will run automatically.
+#
+configure_image_for_demo() {
+
+    #Enable automatic root login on all gettys.
+    #Unfortunately, this is currently the recommended way to do this-- the only other option is to
+    #strip out authentication altogether by an equivalent modification of PAM's configuration.
+    sed -i "s/agetty --noclear/agetty --autologin root --noclear/" ${IMAGE_ROOTFS}${systemd_unitdir}/system/getty@.service
+
+    #... and configure our shell to automatically start the xfce on the first tty.
+    echo 'cd /install/' >> ${IMAGE_ROOTFS}/etc/profile
+    echo '[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startxfce4' >> ${IMAGE_ROOTFS}/etc/profile
+
+}
+IMAGE_PREPROCESS_COMMAND += "configure_image_for_demo;"
