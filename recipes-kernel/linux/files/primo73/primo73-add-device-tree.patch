@@ -1,5 +1,5 @@
 From e26413daa4032bb1d1c774eede95fe9189cbaa0b Mon Sep 17 00:00:00 2001
-From: Kyle Temkin <ktemkin@binghamton.edu>
+From: Kyle Temkin <temkink@ainfosec.com>
 Date: Mon, 27 Apr 2015 20:55:11 -0400
 Subject: [PATCH] Add (partial) device tree for MSI Primo73.
 
