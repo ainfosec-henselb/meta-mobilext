@@ -9,6 +9,10 @@
 setenv xen_bootargs  "console=dtuart dtuart=$xen_serial_port dom0_mem=$dom0_memory $xen_extra_bootargs"
 setenv dom0_bootargs "console=hvc0 ignore_loglevel psci=enable clk_ignore_unused root=$dom0_root earlyprintk=xen $dom0_extra_bootargs"
 
+#Choose a device tree size. This should be more than enough for any current device tree,
+#but this can be extended to up to the amount of space reserved in the machine config file.
+setenv dtb_size 10000
+
 #Load each of the images from the USB stick.
 #Note that we use $filesize below, so the order matters.
 fatload $boot_device $boot_partition $xen_addr_r xen-zImage
@@ -19,9 +23,8 @@ setenv kernel_size $filesize
 #Now, we'll rewrite the flat device tree as a simple way of passing
 #options to Xen.
 
-#Open the device tree, and make sure it's the largest size possible.
-fdt addr $dtb_addr_r
-fdt resize
+#Open the device tree, and make sure it's the size provided
+fdt addr $dtb_addr_r $dtb_size
 
 #Ensure we have a chosen section, in case the device does not.
 fdt chosen
