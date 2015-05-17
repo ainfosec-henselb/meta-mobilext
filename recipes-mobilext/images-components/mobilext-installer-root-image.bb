@@ -39,9 +39,9 @@ IMAGE_INSTALL += "\
 
 #Attempt to install the following, if they're provided,
 #(but don't raise an error or warning if they're not).
-#PACKAGE_INSTALL_ATTEMPTONLY += "\
-#    virtual/installer-board-support \
-#"
+PACKAGE_INSTALL_ATTEMPTONLY += "\
+    virtual/installer-board-support \
+"
 
 #Configure the core packages that will set up this system.
 IMAGE_DEV_MANAGER   = "udev"

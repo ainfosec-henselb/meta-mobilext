@@ -8,10 +8,14 @@
 #If no dom0 image has been provided, use the basic platform.
 DOM0_IMAGE ?= "xen-base-dom0-image"
 
+#Determine if this image has any "initial bootloader" dependencies-- that is,
+#bootloader depdenencies from outside of the boot partition image.
+BOOTLOADER_DEPENDENCY = "${@bb.utils.contains("MACHINE_FEATURES", "efi", "", "virtual/bootloader:do_deploy", d)}"
+
 ##Ensure that the relevant pieces are deployed before we try and combine them
 ##into a disk image.
 do_image[depends] += " \
-  virtual/bootloader:do_deploy \
+  ${BOOTLOADER_DEPENDENCY} \
   virtual/boot-partition-image:do_bootimg \
   ${DOM0_IMAGE}:do_deploy \
 "
@@ -26,8 +30,11 @@ STORAGE_IMAGE_TYPE ?= "ext4"
 #included in the hard drive image.
 BOOT_IMAGE_FILE = "${DEPLOY_DIR_IMAGE}/boot-${MACHINE}.hddimg"
 DOM0_IMAGE_FILE = "${DEPLOY_DIR_IMAGE}/${DOM0_IMAGE}-${MACHINE}.${DOM0_IMAGE_TYPE}"
-BOOTLOADER      = "${DEPLOY_DIR_IMAGE}/bootloader-${MACHINE}.bin"
+STAGE1_BOOTLOADER = "${DEPLOY_DIR_IMAGE}/bootloader-${MACHINE}.bin"
 
+#If we're not using an PC with EFI, we'll want to provide a "stage one" bootloader,
+#which will help the system to find the main bootloader located on the boot partition.
+BOOTLOADER = "${@bb.utils.contains("MACHINE_FEATURES", "efi", "", "${STAGE1_BOOTLOADER}", d)}"
 
 inherit disk-image
 
