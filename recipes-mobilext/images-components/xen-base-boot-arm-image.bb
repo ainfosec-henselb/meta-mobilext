@@ -41,20 +41,16 @@ inherit bootimg
 #Ensure that the relevant pieces are deployed before they're
 #needed by the boot-image-creation. Note that we do not append,
 #as we want to override the base class's dependence on syslinux.
-#do_bootimg[depends] = " \
-#  u-boot-mkimage-native:do_populate_sysroot \
-#  dosfstools-native:do_populate_sysroot \
-#  mtools-native:do_populate_sysroot \
-#  parted-native:do_populate_sysroot \
-#  virtual/kernel:do_deploy \
-#  virtual/bootloader:do_deploy \
-#  ${PN}:do_unpack \
-#  xen:do_deploy \
-#"
-
-#DEBUG:
-do_bootimg[depends] = "${PN}:do_unpack"
-
+do_bootimg[depends] = " \
+  u-boot-mkimage-native:do_populate_sysroot \
+  dosfstools-native:do_populate_sysroot \
+  mtools-native:do_populate_sysroot \
+  parted-native:do_populate_sysroot \
+  virtual/kernel:do_deploy \
+  virtual/bootloader:do_deploy \
+  ${PN}:do_unpack \
+  xen:do_deploy \
+"
 
 #
 # Populate the provided working directory with the data to be placed into a hard drive image.
