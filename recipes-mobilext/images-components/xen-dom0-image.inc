@@ -21,10 +21,15 @@ ROOTFS_PKGMANAGE_PKGS ?= '${@base_conditional("ONLINE_PACKAGE_MANAGEMENT", "none
 CONMANPKGS ?= "connman connman-angstrom-settings connman-plugin-loopback connman-plugin-ethernet connman-plugin-wifi"
 CONMANPKGS_libc-uclibc = ""
 
+#If the machine has the VirtualBox feature enabled, enable guest drivers for VirtualBox.
+#(VMWare guest drivers, in turn, are enabled in the appropriate kernel configuration.)
+VIRTUALBOX_PKGS ?= "${@base_contains('MACHINE_FEATURES', 'virtualbox', 'vboxguestdrivers', '', d)}"
+
 IMAGE_INSTALL += " \
 	angstrom-packagegroup-boot \
 	packagegroup-basic \
 	${ROOTFS_PKGMANAGE_PKGS} \
+  ${VIRTUALBOX_PKGS} \
   update-alternatives-cworth \
   packagegroup-xen-tools \
 	systemd-analyze \
