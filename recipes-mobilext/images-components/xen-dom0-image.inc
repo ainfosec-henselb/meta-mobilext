@@ -25,18 +25,22 @@ CONMANPKGS_libc-uclibc = ""
 #(VMWare guest drivers, in turn, are enabled in the appropriate kernel configuration.)
 VIRTUALBOX_PKGS ?= "${@base_contains('MACHINE_FEATURES', 'virtualbox', 'vboxguestdrivers', '', d)}"
 
+#By default, don't install any DRM drivers; we'll assume they're shipped with kernel-modules.
+DRM_DRIVERS ?= ""
+
 IMAGE_INSTALL += " \
-	angstrom-packagegroup-boot \
-	packagegroup-basic \
-	${ROOTFS_PKGMANAGE_PKGS} \
+  angstrom-packagegroup-boot \
+  packagegroup-basic \
+  ${ROOTFS_PKGMANAGE_PKGS} \
   ${VIRTUALBOX_PKGS} \
   update-alternatives-cworth \
   packagegroup-xen-tools \
-	systemd-analyze \
-	cpufreq-tweaks \
+  systemd-analyze \
+  cpufreq-tweaks \
   kernel-modules \
-	${CONMANPKGS} \
-	fixmac \
+  ${CONMANPKGS} \
+  fixmac \
+  ${DRM_DRIVERS} \
 "
 
 #Set the image free space according to the local configuration--
