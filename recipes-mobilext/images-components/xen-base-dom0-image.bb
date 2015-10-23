@@ -17,5 +17,12 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/LICENSE;md5=3f40d7994397109285ec7b81fdeb3
 
 require xen-dom0-image.inc
 
+# henselb added packages for wireless network ops
+# TODO: refactor this for deployment
+IMAGE_INSTALL += " \
+  test-wifi \
+  linux-firmware-rtl8192cu \
+"
+
 export IMAGE_BASENAME = "xen-base-dom0"
 
